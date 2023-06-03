@@ -1,0 +1,27 @@
+const Web3 = require('web3');
+
+// Ganache host aand prot
+const ganacheHost = 'HTTP://127.0.0.1:8545';
+
+// Instant Web3 
+const web3 = new Web3(ganacheHost);
+
+// contract address和 ABI
+const contractAddress = '0xDb3BED06B9404DF6f4c98917f70e2F6Bd8b00Ad4';
+const contractABI = [{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"hasVoted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function","constant":true,"signature":"0x09eef43e"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"options","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"}],"stateMutability":"view","type":"function","constant":true,"signature":"0x409e2205"},{"inputs":[{"internalType":"string","name":"_name","type":"string"}],"name":"createOption","outputs":[],"stateMutability":"nonpayable","type":"function","signature":"0x265875a1"},{"inputs":[{"internalType":"uint256","name":"_optionIndex","type":"uint256"}],"name":"vote","outputs":[],"stateMutability":"nonpayable","type":"function","signature":"0x0121b93f"},{"inputs":[],"name":"getOptionCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function","constant":true,"signature":"0xa6bd5427"},{"inputs":[{"internalType":"uint256","name":"_optionIndex","type":"uint256"}],"name":"getOption","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function","constant":true,"signature":"0x1ce5e9a6"}];
+
+// instant contract
+const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+// use contract method
+async function callContractMethod() {
+  try {
+    await contract.methods.createOption('hellonode').send({ from: '0x77406841F3d84A210Fb42Ff775Ec43A24142e8a2' });
+    console.log('Option created successfully!');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// cann contratc method
+callContractMethod();

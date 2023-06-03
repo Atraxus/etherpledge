@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Voting DApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.2.11/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Simple Voting DApp</h1>
+
+    <div>
+        <label for="optionName">Option Name:</label>
+        <input type="text" id="optionName">
+        <button onclick="createOption()">Create Option</button>
+    </div>
+
+    <h2>Options:</h2>
+    <ul id="optionsList"></ul>
+
+    <h2>Vote:</h2>
+    <div>
+        <select id="optionSelect"></select>
+        <button onclick="vote()">Vote</button>
+    </div>
+
+    <script>
+        // connect to eth node
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+        } else {
+            web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+        }
+
+        // get smart contract instant
+        const contractAddress = '0xDb3BED06B9404DF6f4c98917f70e2F6Bd8b00Ad4';
+        const contractABI = [{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"hasVoted","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function","constant":true,"signature":"0x09eef43e"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"options","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"uint256","name":"voteCount","type":"uint256"}],"stateMutability":"view","type":"function","constant":true,"signature":"0x409e2205"},{"inputs":[{"internalType":"string","name":"_name","type":"string"}],"name":"createOption","outputs":[],"stateMutability":"nonpayable","type":"function","signature":"0x265875a1"},{"inputs":[{"internalType":"uint256","name":"_optionIndex","type":"uint256"}],"name":"vote","outputs":[],"stateMutability":"nonpayable","type":"function","signature":"0x0121b93f"},{"inputs":[],"name":"getOptionCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function","constant":true,"signature":"0xa6bd5427"},{"inputs":[{"internalType":"uint256","name":"_optionIndex","type":"uint256"}],"name":"getOption","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function","constant":true,"signature":"0x1ce5e9a6"}];
+        const votingContract = new web3.eth.Contract(contractABI, contractAddress);
+
+        // create option
+        function createOption() {
+            const optionName = document.getElementById('optionName').value;
+
+            votingContract.methods.createOption(optionName).send({ from: web3.eth.defaultAccount })
+                .then(() => {
+                    alert('Option created');
+                    document.getElementById('optionName').value = '';
+                    loadOptions();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+        // vode
+        function vote() {
+            const optionIndex = document.getElementById('optionSelect').value;
+
+            votingContract.methods.vote(optionIndex).send({ from: web3.eth.defaultAccount })
+                .then(() => {
+                    alert('Voted successfully');
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+        // load option
+        function loadOptions() {
+            votingContract.methods.getOptionCount().call()
+                .then((count) => {
+                    const optionsList = document.getElementById('optionsList');
+                    optionsList.innerHTML = '';
+
+                    for (let i = 0; i < count; i++) {
+                        votingContract.methods.getOption(i).call()
+                            .then((option) => {
+                                const optionName = option[0];
+                                const voteCount = option[1];
+
+                                const optionItem = document.createElement('li');
+                                optionItem.textContent = `${optionName}: Votes - ${voteCount}`;
+                                optionsList.appendChild(optionItem);
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+        // load after the page has been loaded
+        window.onload = function () {
+            loadOptions();
+        };
+    </script>
+</body>
+</html>
