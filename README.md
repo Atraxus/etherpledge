@@ -13,8 +13,9 @@ We currently only support a build with VSCode and the Solidity extension. The ex
 7. Install the [Solidity extension](https://marketplace.visualstudio.com/items?itemName=JuanBlanco.solidity)
 8. Install the [Truffle extension](https://marketplace.visualstudio.com/items?itemName=trufflesuite-csi.truffle-vscode)
 9. Install the [Live Server extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
-10. Right click on `contracts/EtherPledge.sol` and select `Build Contract`
-11. Right click on `contracts/EtherPledge.sol` and select `Deploy Contract to Network`
-12. Select `development` as the network
-13. Run `node exc` in the project directory
-14. Right click on `index.html` and select `Open with Live Server`
+10. Run `truffle init` in the project directory and say no to all questions
+11. Right click on `contracts/EtherPledge.sol` and select `Build Contract`
+12. Right click on `contracts/EtherPledge.sol` and select `Deploy Contract to Network`
+13. Select `development` as the network
+14. Run `node exc` in the project directory
+15. Right click on `index.html` and select `Open with Live Server`
