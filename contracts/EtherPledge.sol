@@ -12,12 +12,15 @@ contract Campaign {
     mapping(address => uint256) public balances;
     mapping(address => uint256) public votes;
 
+    // Constructor takes in the token for voting, the funding goal, and the duration of the campaign.
+    // TODO: Add features on construction
     constructor(VotingToken _token, uint256 _goal, uint256 _duration) {
         token = _token;
         goal = _goal;
         end = block.timestamp + _duration;
     }
 
+    // Pledge ETH to the campaign. Tokens for voting are minted to the sender.
     function pledge() external payable {
         require(block.timestamp <= end, "Crowdfunding period has ended");
         uint256 tokensToMint = msg.value * tokenPerWei;
@@ -25,6 +28,7 @@ contract Campaign {
         balances[msg.sender] += msg.value;
     }
 
+    // Vote for a feature by sending tokens to the contract and specifying the feature (address)
     function vote(uint256 tokens, address feature) external {
         require(tokens <= token.balanceOf(msg.sender), "Not enough tokens");
         token.transferFrom(msg.sender, address(this), tokens);
