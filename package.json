@@ -1,6 +1,27 @@
 {
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.1",
-    "web3": "^1.10.0"
-  }
+    "web3": "^4.0.1"
+  },
+  "name": "etherpledge",
+  "description": "EtherPledge is a university project, where we intend to create a crowdfunding platform based on blockchain technologies.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Atraxus/etherpledge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Atraxus/etherpledge/issues"
+  },
+  "homepage": "https://github.com/Atraxus/etherpledge#readme"
 }
