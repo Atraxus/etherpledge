@@ -57,13 +57,10 @@ typings/
 
 # truffle build directory
 build/
+bin/
 
 # Truffle build artifacts
 artifacts/
-
-# Truffle configuration
-truffle.js
-truffle-config.js
 
 # truffle db
 .truffle/db
