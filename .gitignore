@@ -58,6 +58,7 @@ typings/
 # truffle build directory
 build/
 bin/
+dist/
 
 # Truffle build artifacts
 artifacts/
