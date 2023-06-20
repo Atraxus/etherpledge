@@ -4,10 +4,10 @@ EtherPledge is a university project, where we intend to create a crowdfunding pl
 ## How to build
 We currently only support a build with VSCode and the Solidity extension. The extension will compile the contracts and deploy them to the local Ganache instance.
 
-1. Install [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/)
+1. Install [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) (Downgrade to pecific version below 9.0.0; e.g. ``npm install -g npm@8.19.4``)
 2. Install [Truffle](http://truffleframework.com/) globally: `npm install -g truffle`
 3. Install [Vue.js](https://vuejs.org/) globally: `npm install -g @vue/cli`
-4. Install [Ganache](http://truffleframework.com/ganache/)
+4. Install [Ganache](http://truffleframework.com/ganache/) cli ``npm install -g ganache-cli``
 5. Clone this repository
 6. Run `npm install` in the project directory
 7. Open the project directory in VSCode
