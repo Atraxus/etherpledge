@@ -4,18 +4,21 @@ EtherPledge is a university project, where we intend to create a crowdfunding pl
 ## How to build
 We currently only support a build with VSCode and the Solidity extension. The extension will compile the contracts and deploy them to the local Ganache instance.
 
-1. Install [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/)
+### Prerequisites
+1. Install [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) (Downgrade to pecific version below 9.0.0; e.g. ``npm install -g npm@8.19.4``)
 2. Install [Truffle](http://truffleframework.com/) globally: `npm install -g truffle`
-3. Install [Ganache](http://truffleframework.com/ganache/)
-4. Clone this repository
-5. Run `npm install` in the project directory
-6. Open the project directory in VSCode
-7. Install the [Solidity extension](https://marketplace.visualstudio.com/items?itemName=JuanBlanco.solidity)
-8. Install the [Truffle extension](https://marketplace.visualstudio.com/items?itemName=trufflesuite-csi.truffle-vscode)
-9. Install the [Live Server extension](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer)
-10. Run `truffle init` in the project directory and say no to all questions
-11. Right click on `contracts/EtherPledge.sol` and select `Build Contract`
-12. Right click on `contracts/EtherPledge.sol` and select `Deploy Contract to Network`
-13. Select `development` as the network
-14. Run `node exc` in the project directory
-15. Right click on `index.html` and select `Open with Live Server`
+3. Install [Vue.js](https://vuejs.org/) globally: `npm install -g @vue/cli`
+4. Install [Ganache](http://truffleframework.com/ganache/) cli ``npm install -g ganache-cli``
+5. Clone this repository
+6. Run `npm install` in the project directory
+
+### Backend
+Alternatively you can run the following commands in the project directory:
+1. ``ganache-cli`` (in a separate terminal)
+2. ``truffle compile``
+3. ``truffle migrate --network development``
+
+### Frontend
+- Run ``npm run serve`` and open the displayed URL in your browser
+
+

@@ -5,7 +5,11 @@
     <p>Time Remaining: {{ timeRemaining }} seconds</p>
 
     <h3>Contribute ETH</h3>
-    <input type="number" v-model="contribution" placeholder="Contribution Amount (ETH)" />
+    <input
+      type="number"
+      v-model="contribution"
+      placeholder="Contribution Amount (ETH)"
+    />
     <button @click="pledge">Contribute</button>
 
     <h3>Contributor List</h3>
@@ -18,9 +22,9 @@
 </template>
 
 <script>
-import Web3 from 'web3';
-import CampaignContract from '../../../build/contracts/Campaign.json';
-import bigInt from 'big-integer';
+import Web3 from "web3";
+import CampaignContract from "../../build/contracts/Campaign.json";
+import bigInt from "big-integer";
 
 export default {
   data() {
@@ -36,40 +40,42 @@ export default {
   },
 
   mounted() {
-  this.initializeWeb3().then(() => {
-    if (this.contract !== null) {
-      this.loadContractDetails();
-      this.loadBalances();
-     
-    }
-    setInterval(this.updateTimeRemaining, 1000);
-  });
-}
-,
-
+    this.initializeWeb3().then(() => {
+      if (this.contract !== null) {
+        this.loadContractDetails();
+        this.loadBalances();
+      }
+      setInterval(this.updateTimeRemaining, 1000);
+    });
+  },
   methods: {
     async initializeWeb3() {
       try {
-        if (typeof window.ethereum !== 'undefined') {
-          await window.ethereum.request({ method: 'eth_requestAccounts' });
+        if (typeof window.ethereum !== "undefined") {
+          await window.ethereum.request({ method: "eth_requestAccounts" });
           this.web3 = new Web3(window.ethereum);
         } else {
-          console.error('Please install the MetaMask plugin and connect to the Ethereum network.');
+          console.error(
+            "Please install the MetaMask plugin and connect to the Ethereum network."
+          );
         }
 
-        const contractAddress = '0xC504bFc8b8f8E903F9f6A5C098A811c4E6E5a446';
-        this.contract = new this.web3.eth.Contract(CampaignContract.abi, contractAddress);
+        const contractAddress = "0xC504bFc8b8f8E903F9f6A5C098A811c4E6E5a446";
+        this.contract = new this.web3.eth.Contract(
+          CampaignContract.abi,
+          contractAddress
+        );
 
-        const privateKey = '0x1de42d51fd420f56ab7b61b6a02ab5a00a33037b5479007cedba0eb72dbb29fb'; // Ganache account private key
+        const privateKey =
+          "0x1de42d51fd420f56ab7b61b6a02ab5a00a33037b5479007cedba0eb72dbb29fb"; // Ganache account private key
         const account = this.web3.eth.accounts.privateKeyToAccount(privateKey);
         this.web3.eth.defaultAccount = account.address;
         this.web3.eth.accounts.wallet.add(account);
 
         console.log("add", account.address);
-        console.log('Contract:', this.contract);
-
+        console.log("Contract:", this.contract);
       } catch (error) {
-        console.error('Failed to initialize Web3:', error);
+        console.error("Failed to initialize Web3:", error);
       }
     },
 
@@ -85,7 +91,10 @@ export default {
     },
 
     async pledge() {
-      const weiAmount = this.web3.utils.toWei(this.contribution.toString(), 'ether');
+      const weiAmount = this.web3.utils.toWei(
+        this.contribution.toString(),
+        "ether"
+      );
 
       try {
         await this.contract.methods.pledge().send({
@@ -107,7 +116,7 @@ export default {
       for (let i = 0; i < accounts.length; i++) {
         const address = accounts[i];
         const balance = await this.contract.methods.balances(address).call();
-        balances[address] = this.web3.utils.fromWei(balance, 'ether');
+        balances[address] = this.web3.utils.fromWei(balance, "ether");
       }
 
       this.balances = balances;
