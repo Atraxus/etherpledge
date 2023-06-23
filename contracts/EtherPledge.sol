@@ -8,8 +8,15 @@ contract Campaign is Ownable {
     VotingToken public token;
     uint256 public goal;
     uint256 public end;
-    uint256 public constant tokenPerWei = 10;
-    bool public isCampaignOpen = true;
+    uint256 public constant tokenPerWei = 1;
+
+    // Campaign status enum
+    enum CampaignStatus {
+        Open,
+        Failed,
+        Successful
+    }
+    CampaignStatus public status;
 
     mapping(address => uint256) public balances;
     mapping(address => uint256) public votes;
@@ -45,6 +52,7 @@ contract Campaign is Ownable {
             _features.length == _descriptions.length,
             "Features and descriptions should have same length"
         );
+
         token = _token;
         goal = _goal;
         end = block.timestamp + _duration;
@@ -54,27 +62,23 @@ contract Campaign is Ownable {
         }
     }
 
-    // Modify the pledge function to emit the event
+    // Function to pledge ETH to the contract. Emits the Pledged event after the state changes.
     function pledge() external payable {
-        require(isCampaignOpen, "Campaign has ended");
-        require(block.timestamp <= end, "Crowdfunding period has ended");
+        require(status() == CampaignStatus.Open, "Campaign is not open");
+
         uint256 tokensToMint = msg.value * tokenPerWei;
         token.mint(msg.sender, tokensToMint);
         balances[msg.sender] += msg.value;
-
-        // Check if the campaign has reached its goal
-        if (address(this).balance >= goal) {
-            isCampaignOpen = false;
-        }
 
         // Emit the event after the state changes
         emit Pledged(msg.sender, msg.value, tokensToMint);
     }
 
-    // Modify the vote function to emit the event
+    // Function to vote for a feature. Emits the Voted event after the state changes.
     function vote(uint256 tokens, address feature) external {
         require(tokens <= token.balanceOf(msg.sender), "Not enough tokens");
         require(isValidFeature(feature), "Invalid feature");
+
         token.transferFrom(msg.sender, address(this), tokens);
         votes[feature] += tokens;
 
@@ -82,7 +86,7 @@ contract Campaign is Ownable {
         emit Voted(msg.sender, tokens, feature);
     }
 
-    // Check if the given feature is valid
+    // Check the given feature against the list of features provided during construction
     function isValidFeature(address feature) public view returns (bool) {
         for (uint i = 0; i < features.length; i++) {
             if (features[i] == feature) {
@@ -92,21 +96,38 @@ contract Campaign is Ownable {
         return false;
     }
 
-    // Add a function for the owner to collect all the funds once the campaign is successful
+    // Function for the owner to collect all the funds once the campaign is successful
     function collectFunds() external onlyOwner {
-        require(block.timestamp > end, "Crowdfunding period has not ended");
-        require(address(this).balance >= goal, "Campaign was not successful");
+        require(
+            status() == CampaignStatus.Successful,
+            "Campaign was not successful"
+        );
 
         // Transfer all funds to the owner
         payable(owner()).transfer(address(this).balance);
     }
 
-    // Withdraw ETH from the contract if the campaign failed
+    // Function for the donors to withdraw their funds if the campaign fails
     function withdraw() external {
-        require(block.timestamp > end, "Crowdfunding period has not ended");
-        require(address(this).balance < goal, "Campaign was successful");
+        require(status() == CampaignStatus.Failed, "Campaign was successful");
+
+        // Transfer the balance of the sender to the sender and set the balance to 0
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
         payable(msg.sender).transfer(amount);
+    }
+
+    // Update the status of the campaign and return it
+    function status() external returns (CampaignStatus) {
+        if (block.timestamp > end) {
+            if (address(this).balance >= goal) {
+                status = CampaignStatus.Successful;
+            } else {
+                status = CampaignStatus.Failed;
+            }
+        } else {
+            status = CampaignStatus.Open;
+        }
+        return status;
     }
 }
