@@ -8,12 +8,12 @@ We currently only support a build with VSCode and the Solidity extension. The ex
 1. Install [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) (Downgrade to pecific version below 9.0.0; e.g. ``npm install -g npm@8.19.4``)
 2. Install [Truffle](http://truffleframework.com/) globally: `npm install -g truffle`
 3. Install [Vue.js](https://vuejs.org/) globally: `npm install -g @vue/cli`
-4. Install [Ganache](http://truffleframework.com/ganache/) cli ``npm install -g ganache-cli``
+4. Install [Ganache](http://truffleframework.com/ganache/) globally: ``npm install -g ganache-cli``
 5. Clone this repository
 6. Run `npm install` in the project directory
 
 ### Backend
-Alternatively you can run the following commands in the project directory:
+Run the following commands in the project directory:
 1. ``ganache-cli`` (in a separate terminal)
 2. ``truffle compile``
 3. ``truffle migrate --network development``
