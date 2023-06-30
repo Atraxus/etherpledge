@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 import "./VotingToken.sol";
@@ -62,9 +63,23 @@ contract Campaign is Ownable {
         }
     }
 
+    // Update the status of the campaign and return it
+    function getStatus() internal returns (CampaignStatus) {
+        if (block.timestamp > end) {
+            if (address(this).balance >= goal) {
+                status = CampaignStatus.Successful;
+            } else {
+                status = CampaignStatus.Failed;
+            }
+        } else {
+            status = CampaignStatus.Open;
+        }
+        return status;
+    }
+
     // Function to pledge ETH to the contract. Emits the Pledged event after the state changes.
     function pledge() external payable {
-        require(status() == CampaignStatus.Open, "Campaign is not open");
+        require(getStatus() == CampaignStatus.Open, "Campaign is not open");
 
         uint256 tokensToMint = msg.value * tokenPerWei;
         token.mint(msg.sender, tokensToMint);
@@ -99,7 +114,7 @@ contract Campaign is Ownable {
     // Function for the owner to collect all the funds once the campaign is successful
     function collectFunds() external onlyOwner {
         require(
-            status() == CampaignStatus.Successful,
+            getStatus() == CampaignStatus.Successful,
             "Campaign was not successful"
         );
 
@@ -109,25 +124,14 @@ contract Campaign is Ownable {
 
     // Function for the donors to withdraw their funds if the campaign fails
     function withdraw() external {
-        require(status() == CampaignStatus.Failed, "Campaign was successful");
+        require(
+            getStatus() == CampaignStatus.Failed,
+            "Campaign was successful"
+        );
 
         // Transfer the balance of the sender to the sender and set the balance to 0
         uint256 amount = balances[msg.sender];
         balances[msg.sender] = 0;
         payable(msg.sender).transfer(amount);
-    }
-
-    // Update the status of the campaign and return it
-    function status() external returns (CampaignStatus) {
-        if (block.timestamp > end) {
-            if (address(this).balance >= goal) {
-                status = CampaignStatus.Successful;
-            } else {
-                status = CampaignStatus.Failed;
-            }
-        } else {
-            status = CampaignStatus.Open;
-        }
-        return status;
     }
 }
