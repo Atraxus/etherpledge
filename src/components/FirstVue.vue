@@ -184,7 +184,7 @@ export default {
       name: 'Buy a Cat',
       description: 'A project to raise funds for buying a lovely cat'
     }],
-      privateKey: '0xd51456b59df4839f76240a0290601d60b39a01de', // 您的私钥
+      privateKey: '0x01c0d5b894c8f0c47de08e7cd8c5c1596b29ad18c644e3617d1df07a48505ca6', // 您的私钥
       status: 'Open'
     };
   },
@@ -204,7 +204,7 @@ export default {
     async initializeWeb3() {
   try {
     // connect to local ganach
-    this.web3 = new Web3('http://localhost:8545'); // 更新为正确的主机和端口
+    this.web3 = new Web3('http://localhost:8545'); // update to correct ganach
 
     // get 10 accounts Ganache 
     const accounts = await this.web3.eth.getAccounts();
@@ -213,7 +213,7 @@ export default {
     this.web3.eth.defaultAccount = accounts[0];
     console.log('Accounts:', accounts); // print account list 
 
-    const campaignContractAddress = '0xd51456b59df4839f76240a0290601d60b39a01de'; // replace to smart contract
+    const campaignContractAddress = '0x5866412607FD7A08F9C7Bf3a64D9A646dd0eDf3f'; // replace to smart contract
     this.campaignContract = new this.web3.eth.Contract(CampaignContract.abi, campaignContractAddress);
 
     const votingTokenContractAddress = '0x316572851Ad0a184c2140114e752B33aF5D470F6'; // replace to your contract

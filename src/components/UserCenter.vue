@@ -3,7 +3,11 @@
 import { defineExpose } from 'vue';
 import { ref, onMounted } from 'vue';
 import Web3 from 'web3';
-
+import UserCenter from "@/components/UserCenter.vue";
+import CampaignContract from '../../build/contracts/Campaign.json';
+import VotingTokenContract from '../../build/contracts/VotingToken.json';
+import CreateCrowdfuning from "@/components/CreateCrowdfunding.vue";
+import bigInt from 'big-integer';
 // 导入路由
 import { useRouter } from 'vue-router';
 
@@ -53,13 +57,15 @@ const send= async() => {
     console.log(value)
     // P23 19:00https://www.bilibili.com/video/BV14A411178x?p=23&spm_id_from=pageDriver&vd_source=7550b7ac162b7a1c3b89987953b944bb
 };
-
-// 跳转到用户中心页面的方法
-const gotoUserCenter = () => {
-  router.push({ name: 'Web3UserCenter' });
+const gotoStartCrowdfunding = () => {
+  router.push('/createcrowdfunding');
 };
 
+
 const discoverCount = ref(8);
+
+
+
 const joinedCount = ref(2);
 const favoriteCount = ref(5);
 
@@ -115,7 +121,7 @@ const favoriteCount = ref(5);
     </div>
 
     <div class="StartCrowdfounding-section"> 
-      <van-button type="primary" class="action-button" @click="gotoStartCrowdfounding">Start Crowdfunding</van-button>
+      <van-button type="primary" class="action-button" @click="gotoStartCrowdfunding">Start Crowdfunding</van-button>
     </div>
 
     <div class="User-section">
