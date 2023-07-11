@@ -1,126 +1,303 @@
 <template>
-  <div>
-    <h2>Crowdfunding Campaign</h2>
-    <p>Goal Amount: {{ goal }} ETH</p>
-    <p>Time Remaining: {{ timeRemaining }} seconds</p>
-
-    <h3>Contribute ETH</h3>
-    <input
-      type="number"
-      v-model="contribution"
-      placeholder="Contribution Amount (ETH)"
-    />
-    <button @click="pledge">Contribute</button>
-
-    <h3>Contributor List</h3>
-    <ul>
-      <li v-for="(balance, address) in balances" :key="address">
-        {{ address }}: {{ balance }} ETH
-      </li>
-    </ul>
+  <div class="container">
+    <h1>Top Project Today</h1>
+    <div class="topcontainer">
+      <div class="information-container">
+        <h2>Project Information</h2>
+        <p>{{ projectInfo }}</p>
+        <p>
+          <span class="label">Goal Amount:</span> {{ goal }} <span class="unit">ETH</span>
+        </p>
+        <p>
+          <span class="label">Time Remaining:</span> {{ timeRemaining }} <span class="unit">seconds</span>
+        </p>
+        <p>
+          <span class="label">Raised Money</span> {{ raisedAmount }} <span class="unit">ETH</span>
+        </p>
+      </div>
+      <div class="spacer"></div> <!-- Add this empty spacer element -->
+      <div class="funder-information">
+        <h2>Funder Information</h2>
+        <p>{{ funderInfo }}</p>
+        <img src="../assets/main.jpg" alt="Funder Image" class="funder-image" style="width: 50%; height: auto;" />
+      </div>
+    </div>
+    <div class="midcontainer">
+      <div class="contributor-eth">
+        <h3>Contribute ETH</h3>
+        <input type="number" v-model="contribution" placeholder="Contribution Amount (ETH)" />
+        <button @click="pledge" :disabled="!isWeb3Initialized">Contribute</button>
+      </div>
+      <div class="contributor-list">
+        <h3>Contributor List</h3>
+        <ul>
+          <li v-for="(balance, address) in balances" :key="address">
+            {{ address }}: {{ balance }} ETH
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottomcontainer">
+      <h3>Other Projects You May Be Interested In:</h3>
+      <ul>
+        <li v-for="project in projects" :key="project.id">
+          {{ project.name }} - {{ project.description }}
+          <button @click="view(project.id)">View</button>
+        </li>
+      </ul>
+      
+      <button class="login-button" @click="login">Login</button>
+      
+    </div>
   </div>
 </template>
 
+<style>
+.container {
+  background-image: url('../assets/background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  background-position: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+p {
+  color: #fff; /* 设置字体颜色，可以使用颜色的名称或十六进制值 */
+}
+li {
+  color: #fff; /* 设置字体颜色，可以使用颜色的名称或十六进制值 */
+}
+h1, h2, h3 {
+  color: #fff;
+  text-align: center;
+}
+
+.topcontainer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.information-container, .funder-information {
+  flex-basis: 50%;
+}
+
+.label {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.unit {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.funder-image {
+  width: 100%;
+  height: auto;
+  margin-top: 20px;
+}
+.spacer {
+  width: 200px; /* Adjust the width as per your desired spacing */
+}
+.midcontainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 40px;
+}
+
+.contributor-eth {
+  margin: 0px 0;
+}
+
+.bottomcontainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+
+
+.login-button {
+  position: absolute;
+  top: 100px;
+  right: 10px;
+  
+  padding: 10px 30px; /* 调整按钮的上下和左右内边距 */
+  font-size: 18px; /* 调整按钮的字体大小 */
+  
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin: 10px 0;
+}
+
+li button {
+  padding: 5px 10px;
+  font-size: 14px;
+}
+</style>
+
 <script>
-import Web3 from "web3";
-import CampaignContract from "../../build/contracts/Campaign.json";
-import bigInt from "big-integer";
+import Web3 from 'web3';
+import UserCenter from "@/components/UserCenter.vue";
+import CampaignContract from '../../build/contracts/Campaign.json';
+import VotingTokenContract from '../../build/contracts/VotingToken.json';
+import bigInt from 'big-integer';
+
 
 export default {
+  components: {
+    UserCenter,
+  },
   data() {
     return {
       web3: null,
-      contract: null,
+      campaignContract: null,
+      votingTokenContract: null,
       goal: null,
+      raisedAmount: 0,
       end: null,
       timeRemaining: 0,
       contribution: 0,
       balances: {},
+      isWeb3Initialized: false,
+      projectInfo: "*****************************************************\n*****************************************************\n*****************************************************\n*****************************************************",
+      funderInfo: "*****************************************************\n*****************************************************\n*****************************************************",
+      projects: [ {
+      id: 1,
+      name: 'Buy a Cat',
+      description: 'A project to raise funds for buying a lovely cat'
+    }],
+      privateKey: '0xd51456b59df4839f76240a0290601d60b39a01de', // 您的私钥
+      status: 'Open'
     };
   },
-
   mounted() {
     this.initializeWeb3().then(() => {
-      if (this.contract !== null) {
+      if (this.campaignContract !== null) {
         this.loadContractDetails();
         this.loadBalances();
+        this.updateRaisedAmount();
+        
       }
       setInterval(this.updateTimeRemaining, 1000);
+      this.status = 'Open';
     });
   },
   methods: {
     async initializeWeb3() {
-      try {
-        if (typeof window.ethereum !== "undefined") {
-          await window.ethereum.request({ method: "eth_requestAccounts" });
-          this.web3 = new Web3(window.ethereum);
-        } else {
-          console.error(
-            "Please install the MetaMask plugin and connect to the Ethereum network."
-          );
-        }
+  try {
+    // connect to local ganach
+    this.web3 = new Web3('http://localhost:8545'); // 更新为正确的主机和端口
 
-        const contractAddress = "0xC504bFc8b8f8E903F9f6A5C098A811c4E6E5a446";
-        this.contract = new this.web3.eth.Contract(
-          CampaignContract.abi,
-          contractAddress
-        );
+    // get 10 accounts Ganache 
+    const accounts = await this.web3.eth.getAccounts();
 
-        const privateKey =
-          "0x1de42d51fd420f56ab7b61b6a02ab5a00a33037b5479007cedba0eb72dbb29fb"; // Ganache account private key
-        const account = this.web3.eth.accounts.privateKeyToAccount(privateKey);
-        this.web3.eth.defaultAccount = account.address;
-        this.web3.eth.accounts.wallet.add(account);
+    // set first account as default
+    this.web3.eth.defaultAccount = accounts[0];
+    console.log('Accounts:', accounts); // print account list 
 
-        console.log("add", account.address);
-        console.log("Contract:", this.contract);
-      } catch (error) {
-        console.error("Failed to initialize Web3:", error);
-      }
-    },
+    const campaignContractAddress = '0xd51456b59df4839f76240a0290601d60b39a01de'; // replace to smart contract
+    this.campaignContract = new this.web3.eth.Contract(CampaignContract.abi, campaignContractAddress);
+
+    const votingTokenContractAddress = '0x316572851Ad0a184c2140114e752B33aF5D470F6'; // replace to your contract
+    this.votingTokenContract = new this.web3.eth.Contract(VotingTokenContract.abi, votingTokenContractAddress);
+
+    console.log('Campaign Contract:', this.campaignContract);
+    console.log('Voting Token Contract:', this.votingTokenContract);
+    
+    this.isWeb3Initialized = true;
+  } catch (error) {
+    console.error('Failed to initialize Web3:', error);
+  }
+}
+,
 
     async loadContractDetails() {
-      this.goal = await this.contract.methods.goal().call();
-      this.end = await this.contract.methods.end().call();
+      this.goal = await this.campaignContract.methods.goal().call();
+      this.end = await this.campaignContract.methods.end().call();
     },
-
+    
     async updateTimeRemaining() {
       const currentTime = bigInt(Math.floor(Date.now() / 1000));
       const end = bigInt(this.end);
       this.timeRemaining = Number(bigInt.max(bigInt(0), end - currentTime));
     },
-
+    
     async pledge() {
-      const weiAmount = this.web3.utils.toWei(
-        this.contribution.toString(),
-        "ether"
-      );
+  const weiAmount = this.web3.utils.toWei(this.contribution.toString(), 'ether');
+  
+  try {
+    await this.campaignContract.methods.pledge().send({
+      from: this.web3.eth.defaultAccount,
+      value: weiAmount
+    });
 
-      try {
-        await this.contract.methods.pledge().send({
-          from: this.web3.eth.defaultAccount,
-          value: weiAmount,
-        });
+    this.contribution = 0;
+    await this.updateRaisedAmount();
+    await this.loadBalances();
+     // fresh funded money
+  } catch (error) {
+    console.error(error);
+  }
+},
 
-        this.contribution = 0;
-        await this.loadBalances();
-      } catch (error) {
-        console.error(error);
-      }
-    },
-
+/*
+async pledge() {
+  const weiAmount = this.web3.utils.toWei(this.contribution.toString(), 'ether');
+  
+  try {
+    this.contribution = 0;
+    await this.updateRaisedAmount();
+    await this.loadBalances();
+     // 更新已筹集的金额
+  } catch (error) {
+    console.error(error);
+  }
+},
+*/
     async loadBalances() {
+      if (!this.isWeb3Initialized) return;
+
       const accounts = await this.web3.eth.getAccounts();
       const balances = {};
 
       for (let i = 0; i < accounts.length; i++) {
         const address = accounts[i];
-        const balance = await this.contract.methods.balances(address).call();
-        balances[address] = this.web3.utils.fromWei(balance, "ether");
+        const balance = await this.web3.eth.getBalance(address);
+        balances[address] = this.web3.utils.fromWei(balance, 'ether');
       }
 
       this.balances = balances;
     },
+    async updateRaisedAmount() {
+  try {
+    const balance = await this.web3.eth.getBalance(this.campaignContract.options.address);
+    this.raisedAmount = this.web3.utils.fromWei(balance, 'ether');
+  } catch (error) {
+    console.error('Failed to update raised amount:', error);
+  }
+},
+ login() {
+    this.$router.push({ name: 'UserCenter' });
   },
+
+  }
 };
 </script>
