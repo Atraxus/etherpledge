@@ -20,5 +20,6 @@ Run the following commands in the project directory:
 
 ### Frontend
 - Run ``npm run serve`` and open the displayed URL in your browser
-
-
+- npm install --save-dev less-loader less
+- npm install vue-router@4
+- remember change the contract address,private key in the FirstVue.vue base on the deployment
