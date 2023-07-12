@@ -4,7 +4,10 @@
     "web3": "^4.0.1",
     "vue": "^3.3.4",
     "@vue/cli-service": "^5.0.0",
-    "big-integer": "^1.6.51"
+    "big-integer": "^1.6.51",
+    "vue-router": "^4.0.12",
+    "less": "^4.1.1",
+    "less-loader": "^10.2.0"
   },
   "name": "etherpledge",
   "description": "EtherPledge is a university project, where we intend to create a crowdfunding platform based on blockchain technologies.",

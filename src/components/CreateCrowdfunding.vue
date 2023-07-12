@@ -3,10 +3,17 @@
     <h1>Start Crowdfunding</h1>
     <div class="content">
       <p>Current network environment: {{ currentNetwork }}</p>
-      <p>Set project name: <input v-model="projectName" type="text"></p>
-      <p>Crowdfunding target amount: <input v-model="projectGoal" type="text"></p>
-      <p>End Time: <input v-model="endTime" type="datetime-local" lang="en"></p>
-      <p>project description: <textarea v-model="projectDescription" rows="4"></textarea></p>
+      <p>Set project name: <input v-model="projectName" type="text" /></p>
+      <p>
+        Crowdfunding target amount: <input v-model="projectGoal" type="text" />
+      </p>
+      <p>
+        End Time: <input v-model="endTime" type="datetime-local" lang="en" />
+      </p>
+      <p>
+        project description:
+        <textarea v-model="projectDescription" rows="4"></textarea>
+      </p>
       <button @click="deployContract">Publish contract</button>
       <p v-if="contractDeployed">{{ deploymentResult }}</p>
       <p v-if="deploymentError">{{ deploymentError }}</p>
@@ -18,28 +25,30 @@
 export default {
   data() {
     return {
-      currentNetwork: '',
-      projectName: '',
-      projectGoal: '',
-      endTime: '',
-      projectDescription: '',
+      currentNetwork: "",
+      projectName: "",
+      projectGoal: "",
+      endTime: "",
+      projectDescription: "",
       contractDeployed: false,
-      deploymentResult: '',
-      deploymentError: ''
-    }
+      deploymentResult: "",
+      deploymentError: "",
+    };
   },
   methods: {
     deployContract() {
       // 假设 deploy() 是一个返回 Promise 的函数
-      deploy().then((contractAddress) => {
-        this.contractDeployed = true;
-        this.deploymentResult = '发布成功，合约地址：' + contractAddress;
-      }).catch((error) => {
-        this.deploymentError = '发布失败，请重新设置';
-      });
-    }
-  }
-}
+      deploy()
+        .then((contractAddress) => {
+          this.contractDeployed = true;
+          this.deploymentResult = "发布成功，合约地址：" + contractAddress;
+        })
+        .catch((error) => {
+          this.deploymentError = "发布失败，请重新设置";
+        });
+    },
+  },
+};
 </script>
 
 <style lang="less">

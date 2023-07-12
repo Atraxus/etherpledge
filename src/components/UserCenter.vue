@@ -1,11 +1,11 @@
 <script setup>
 // 导入需要的模块和函数
-import { defineExpose } from 'vue';
-import { ref, onMounted } from 'vue';
-import Web3 from 'web3';
+import { defineExpose } from "vue";
+import { ref, onMounted } from "vue";
+import Web3 from "web3";
 
 // 导入路由
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 
 // 获取路由实例
 const router = useRouter();
@@ -13,13 +13,14 @@ const router = useRouter();
 // 创建web3实例，如果在支持以太坊的浏览器 "Web3.providers.givenProvider" 会被设置。
 const web3 = new Web3(
   Web3.givenProvider ||
-    'https://sepolia.infura.io/v3/0bae90d1476b4b97b8222e545de219e9'
+    "https://sepolia.infura.io/v3/0bae90d1476b4b97b8222e545de219e9"
 );
 
 // 创建账户
 // const account = web3.eth.accounts.create('123');
 // 替换为你的以太坊账号的私钥
-const privateKey = '0xfd3b8c962d6c2093bd8d26488174ec0b1ebb11f5cfbceb273dd83b6a95fa50fb';
+const privateKey =
+  "0xfd3b8c962d6c2093bd8d26488174ec0b1ebb11f5cfbceb273dd83b6a95fa50fb";
 
 // 将私钥转换为账号对象
 const account = web3.eth.accounts.privateKeyToAccount(privateKey);
@@ -33,73 +34,81 @@ onMounted(async () => {
     const balance = await web3.eth.getBalance(account.address);
 
     // 将余额赋值给mount
-    mount.value = web3.utils.fromWei(balance, 'ether');
+    mount.value = web3.utils.fromWei(balance, "ether");
   } catch (error) {
-    console.error('获取地址余额时出错：', error);
+    console.error("获取地址余额时出错：", error);
   }
 });
 
 // 转账操作
-const send= async() => {
-    console.log('test send')
-    // 1.构建转账的参数
-    // 账户交易的次数
-    const nonce= await web3.eth.getTransactionCount(account.address.value)
-    console.log(nonce)
-    // 获取预计转账的gas费用
-    const gasPrise = web3.eth.getGasPrice()
-    // 转账金额，以wei为单位
-    const value =web3.utils.toWei("0.01")
-    console.log(value)
-    // P23 19:00https://www.bilibili.com/video/BV14A411178x?p=23&spm_id_from=pageDriver&vd_source=7550b7ac162b7a1c3b89987953b944bb
+const send = async () => {
+  console.log("test send");
+  // 1.构建转账的参数
+  // 账户交易的次数
+  const nonce = await web3.eth.getTransactionCount(account.address.value);
+  console.log(nonce);
+  // 获取预计转账的gas费用
+  const gasPrise = web3.eth.getGasPrice();
+  // 转账金额，以wei为单位
+  const value = web3.utils.toWei("0.01");
+  console.log(value);
+  // P23 19:00https://www.bilibili.com/video/BV14A411178x?p=23&spm_id_from=pageDriver&vd_source=7550b7ac162b7a1c3b89987953b944bb
 };
 
 // 跳转到用户中心页面的方法
 const gotoUserCenter = () => {
-  router.push({ name: 'Web3UserCenter' });
+  router.push({ name: "Web3UserCenter" });
 };
 
 const discoverCount = ref(8);
 const joinedCount = ref(2);
 const favoriteCount = ref(5);
-
-
-
 </script>
 
 <template>
-<div class="container">
-
-  <div class="logo">
-    <img v-if="logoSrc" :src="src/components/UserLogo.png" alt="Logo">
-  </div>
+  <div class="container">
+    <div class="logo">
+      <img v-if="logoSrc" :src="src / components / UserLogo.png" alt="Logo" />
+    </div>
 
     <div class="title">
-     <h1 class="title">User Center</h1>
+      <h1 class="title">User Center</h1>
     </div>
 
     <div class="divider"></div>
 
     <div class="account-info">
-  <div class="textbox-container">
-    <p class="label">Adress</p>
-    <div class="label-space"></div>
-    <textarea class="textbox" v-model="account.address"></textarea>
-    <van-button type="secondary" class="copy-button" @click="copyText(account.address)">Copy</van-button>
-  </div>
-  <div class="textbox-container">
-    <p class="label">PrivateKey</p>
-    <div class="label-space"></div>
-    <textarea class="textbox" v-model="account.privateKey"></textarea>
-    <van-button type="secondary" class="copy-button" @click="copyText(account.privateKey)">Copy</van-button>
-  </div>
-  <div class="textbox-container">
-    <p class="label">Balance</p>
-    <div class="label-space"></div>
-    <textarea class="textbox" v-model="mount"></textarea>
-    <van-button type="secondary" class="transfer-button" @click="send">Transfer</van-button>
-  </div>
-  </div>
+      <div class="textbox-container">
+        <p class="label">Adress</p>
+        <div class="label-space"></div>
+        <textarea class="textbox" v-model="account.address"></textarea>
+        <van-button
+          type="secondary"
+          class="copy-button"
+          @click="copyText(account.address)"
+          >Copy</van-button
+        >
+      </div>
+      <div class="textbox-container">
+        <p class="label">PrivateKey</p>
+        <div class="label-space"></div>
+        <textarea class="textbox" v-model="account.privateKey"></textarea>
+        <van-button
+          type="secondary"
+          class="copy-button"
+          @click="copyText(account.privateKey)"
+          >Copy</van-button
+        >
+      </div>
+      <div class="textbox-container">
+        <p class="label">Balance</p>
+        <div class="label-space"></div>
+        <textarea class="textbox" v-model="mount"></textarea>
+        <van-button type="secondary" class="transfer-button" @click="send"
+          >Transfer</van-button
+        >
+      </div>
+    </div>
     <div><h3 class="title">Crowdfunding Project</h3></div>
     <div class="CrowdfundingProjectNumber">
       <div class="discoverCount">{{ discoverCount }}</div>
@@ -107,19 +116,31 @@ const favoriteCount = ref(5);
       <div class="favoriteCount">{{ favoriteCount }}</div>
     </div>
 
-
     <div class="CrowdfundingProject">
-      <van-button type="primary" class="action-button" @click="DiscoverProject">Discover</van-button>
-      <van-button type="primary" class="action-button" @click="JoinedProject">Joined</van-button>
-      <van-button type="primary" class="action-button" @click="FavoriteProject">Favorite</van-button>
+      <van-button type="primary" class="action-button" @click="DiscoverProject"
+        >Discover</van-button
+      >
+      <van-button type="primary" class="action-button" @click="JoinedProject"
+        >Joined</van-button
+      >
+      <van-button type="primary" class="action-button" @click="FavoriteProject"
+        >Favorite</van-button
+      >
     </div>
 
-    <div class="StartCrowdfounding-section"> 
-      <van-button type="primary" class="action-button" @click="gotoStartCrowdfounding">Start Crowdfunding</van-button>
+    <div class="StartCrowdfounding-section">
+      <van-button
+        type="primary"
+        class="action-button"
+        @click="gotoStartCrowdfounding"
+        >Start Crowdfunding</van-button
+      >
     </div>
 
     <div class="User-section">
-      <van-button type="primary" class="action-button" @click="gotoHome">Home</van-button>
+      <van-button type="primary" class="action-button" @click="gotoHome"
+        >Home</van-button
+      >
     </div>
   </div>
 </template>
@@ -127,7 +148,9 @@ const favoriteCount = ref(5);
 
 
 <style lang="less">
-h1, h2,h3 {
+h1,
+h2,
+h3 {
   text-align: center; /* 添加居中对齐样式 */
 }
 .container {
@@ -135,7 +158,6 @@ h1, h2,h3 {
   align-items: center;
   background-color: rgb(131, 175, 155);
 }
-
 
 .title {
   font-size: 24px;
@@ -166,7 +188,6 @@ h1, h2,h3 {
   display: flex;
   align-items: center;
   margin-bottom: 10px;
-
 }
 
 .label {
@@ -189,7 +210,6 @@ h1, h2,h3 {
   height: 19px; /* 设置统一的高度 */
 }
 
-
 .copy-button {
   margin-left: 10px;
 }
@@ -208,7 +228,7 @@ h1, h2,h3 {
   left: 16.67%; /* 六分之一位置 */
   font-size: 24px; /* 调整数字尺寸 */
 }
-.joinedCount{
+.joinedCount {
   position: absolute;
   left: 50%; /* 中心位置 */
   transform: translateX(-50%);
