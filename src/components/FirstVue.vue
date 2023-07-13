@@ -171,18 +171,17 @@ li button {
 import Web3 from "web3";
 import UserCenter from "@/components/UserCenter.vue";
 import CampaignContract from "../../build/contracts/Campaign.json";
-import VotingTokenContract from "../../build/contracts/VotingToken.json";
 import bigInt from "big-integer";
 
 export default {
   components: {
     UserCenter,
   },
+
   data() {
     return {
       web3: null,
       campaignContract: null,
-      votingTokenContract: null,
       goal: null,
       raisedAmount: 0,
       end: null,
@@ -205,22 +204,26 @@ export default {
       status: "Open",
     };
   },
-  mounted() {
-    this.initializeWeb3().then(() => {
-      if (this.campaignContract !== null) {
-        this.loadContractDetails();
-        this.loadBalances();
-        this.updateRaisedAmount();
-      }
-      setInterval(this.updateTimeRemaining, 1000);
-      this.status = "Open";
-    });
+
+  async mounted() {
+    await this.initializeWeb3();
+    if (this.campaignContract !== null) {
+      this.loadBalances();
+      this.updateRaisedAmount();
+      this.scanPastEvents(this.campaignContract);
+      this.subscribeToNewEvents(this.campaignContract);
+    }
+    setInterval(this.updateTimeRemaining, 1000);
+    this.status = "Open";
   },
+
   methods: {
     async initializeWeb3() {
       try {
         // connect to local ganach
-        this.web3 = new Web3("http://localhost:8080"); // 更新为正确的主机和端口
+        this.web3 = new Web3(
+          new Web3.providers.WebsocketProvider("ws://localhost:8080")
+        );
 
         // get 10 accounts Ganache
         const accounts = await this.web3.eth.getAccounts();
@@ -230,23 +233,56 @@ export default {
         console.log("Accounts:", accounts); // print account list
 
         const campaignContractAddress =
-          "0x13aCD04fA7F899dbF56397448Cf830D7DE11e384"; // replace to smart contract
+          "0x17BeB31346451C741BcAA09F00699Fd64A8CE476"; // replace to smart contract
         this.campaignContract = new this.web3.eth.Contract(
           CampaignContract.abi,
           campaignContractAddress
         );
 
         console.log("Campaign Contract:", this.campaignContract);
-        console.log("Voting Token Contract:", this.votingTokenContract);
+        console.log("Campaign Events:", this.campaignContract.events);
 
         this.isWeb3Initialized = true;
       } catch (error) {
         console.error("Failed to initialize Web3:", error);
       }
     },
-    async loadContractDetails() {
-      this.goal = await this.campaignContract.methods.goal().call();
-      this.end = await this.campaignContract.methods.end().call();
+
+    async scanPastEvents(contract) {
+      try {
+        const pastEvents = await contract.getPastEvents("allEvents", {
+          fromBlock: 0,
+          toBlock: "latest",
+        });
+
+        pastEvents.forEach((event) => {
+          console.log(event);
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    subscribeToNewEvents(contract) {
+      let options = {
+        fromBlock: 0,
+        address: contract.options.address,
+        topics: [], //What topics to subscribe to
+      };
+
+      this.web3.eth
+        .subscribe("logs", options)
+        .then((subscription) => {
+          subscription.on("data", (event) => console.log(event));
+          subscription.on("changed", (changed) => console.log(changed));
+          subscription.on("error", (err) => {
+            throw err;
+          });
+          subscription.on("connected", (nr) => console.log(nr));
+        })
+        .catch((error) => {
+          console.error("Subscription failed:", error);
+        });
     },
 
     async updateTimeRemaining() {
@@ -277,20 +313,6 @@ export default {
       }
     },
 
-    /*
-async pledge() {
-  const weiAmount = this.web3.utils.toWei(this.contribution.toString(), 'ether');
-  
-  try {
-    this.contribution = 0;
-    await this.updateRaisedAmount();
-    await this.loadBalances();
-     // 更新已筹集的金额
-  } catch (error) {
-    console.error(error);
-  }
-},
-*/
     async loadBalances() {
       if (!this.isWeb3Initialized) return;
 
@@ -305,6 +327,7 @@ async pledge() {
 
       this.balances = balances;
     },
+
     async updateRaisedAmount() {
       try {
         const balance = await this.web3.eth.getBalance(
@@ -315,6 +338,7 @@ async pledge() {
         console.error("Failed to update raised amount:", error);
       }
     },
+
     login() {
       this.$router.push({ name: "UserCenter" });
     },
