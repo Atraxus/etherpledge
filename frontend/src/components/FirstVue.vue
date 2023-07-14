@@ -214,9 +214,8 @@ export default {
     await this.loadCampaign(0);
     if (this.campaign.contract !== null) {
       this.loadBalances();
-      this.updateRaisedAmount();
       this.scanPastEvents(this.campaign.contract);
-      this.subscribeToNewEvents(this.campaign.contract);
+      // this.subscribeToNewEvents(this.campaign.contract);
     }
     setInterval(this.updateTimeRemaining, 1000);
     this.status = "Open";
@@ -291,40 +290,59 @@ export default {
 
     async scanPastEvents(contract) {
       try {
-        const pastEvents = await contract.getPastEvents("allEvents", {
+        // Specify 'Pledged' instead of 'allEvents' to only get the 'Pledged' events
+        const pastEvents = await contract.getPastEvents("Pledged", {
           fromBlock: 0,
           toBlock: "latest",
         });
 
+        // Initialize a variable to calculate total pledged amount
+        let totalPledged = 0;
+
         pastEvents.forEach((event) => {
           console.log(event);
+
+          // Assuming the amount pledged is in the second argument of the event
+          // Add the pledged amount (in Ether) to totalPledged
+          const pledgedAmountInWei = event.returnValues[1];
+          const pledgedAmountInEther = this.web3.utils.fromWei(
+            pledgedAmountInWei,
+            "ether"
+          );
+          totalPledged += parseFloat(pledgedAmountInEther);
         });
+
+        // Update the raisedAmount field with the total pledged amount
+        this.raisedAmount = totalPledged;
+
+        console.log("Total pledged amount:", this.raisedAmount);
       } catch (error) {
         console.error(error);
       }
     },
 
-    subscribeToNewEvents(contract) {
-      let options = {
-        fromBlock: 0,
-        address: contract.options.address,
-        topics: [], //What topics to subscribe to
-      };
+    // Currently not in use
+    // subscribeToNewEvents(contract) {
+    //   let options = {
+    //     fromBlock: 0,
+    //     address: contract.options.address,
+    //     topics: [], //What topics to subscribe to
+    //   };
 
-      this.web3.eth
-        .subscribe("logs", options)
-        .then((subscription) => {
-          subscription.on("data", (event) => console.log(event));
-          subscription.on("changed", (changed) => console.log(changed));
-          subscription.on("error", (err) => {
-            throw err;
-          });
-          subscription.on("connected", (nr) => console.log(nr));
-        })
-        .catch((error) => {
-          console.error("Subscription failed:", error);
-        });
-    },
+    //   this.web3.eth
+    //     .subscribe("logs", options)
+    //     .then((subscription) => {
+    //       subscription.on("data", (event) => console.log(event));
+    //       subscription.on("changed", (changed) => console.log(changed));
+    //       subscription.on("error", (err) => {
+    //         throw err;
+    //       });
+    //       subscription.on("connected", (nr) => console.log(nr));
+    //     })
+    //     .catch((error) => {
+    //       console.error("Subscription failed:", error);
+    //     });
+    // },
 
     async updateTimeRemaining() {
       const currentTime = bigInt(Math.floor(Date.now() / 1000));
@@ -346,7 +364,6 @@ export default {
         });
 
         this.contribution = 0;
-        await this.updateRaisedAmount();
         await this.loadBalances();
         // fresh funded money
       } catch (error) {
@@ -367,17 +384,6 @@ export default {
       }
 
       this.balances = balances;
-    },
-
-    async updateRaisedAmount() {
-      try {
-        const balance = await this.web3.eth.getBalance(
-          this.campaign.contract.options.address
-        );
-        this.campaign.raisedAmount = this.web3.utils.fromWei(balance, "ether");
-      } catch (error) {
-        console.error("Failed to update raised amount:", error);
-      }
     },
 
     login() {
