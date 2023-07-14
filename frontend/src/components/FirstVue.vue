@@ -251,7 +251,7 @@ export default {
 
         this.campaign.address = this.campaigns[0].address;
         this.campaign.contract = new this.web3.eth.Contract(
-          CampaignContract.abi,
+          this.campaigns[0].abi,
           this.campaign.address
         );
 

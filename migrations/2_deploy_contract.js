@@ -19,20 +19,20 @@ module.exports = function (deployer, network, accounts) {
         console.log("Campaign Contract ABI:", JSON.stringify(Campaign.abi));
 
         // Read the existing JSON file
-        let data;
-        try {
-          data = JSON.parse(fs.readFileSync('db.json', 'utf8'));
-        } catch (e) {
-          data = { campaigns: [] };
-        }
+        let data = { campaigns: [] };
 
         // Add deployed contract address and ABI to data
+        let deadline = new Date();
+        deadline.setTime(deadline.getTime() + _duration * 1000);
         data.campaigns.push({
-          address: Campaign.networks[deployer.network_id].address
+          address: Campaign.networks[deployer.network_id].address,
+          goal: _goal,
+          end: deadline,
+          descriptions: _descriptions,
         });
 
         // Write back to file
-        fs.writeFileSync('db.json', JSON.stringify(data, null, 2));
+        fs.writeFileSync('backend/db.json', JSON.stringify(data, null, 2));
       }
     });
 };

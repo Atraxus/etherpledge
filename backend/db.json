@@ -1,7 +1,14 @@
 {
   "campaigns": [
     {
-      "address": "0x900108Af4cbD82091daFFD7169a904d3697Ca935"
+      "address": "0x41501Aa5773f9cdC349cf94314613110C3c71701",
+      "goal": "10000000000000000000",
+      "end": "2023-07-21T14:39:26.974Z",
+      "descriptions": [
+        "Add quorum to decide, when a campaign is successful.",
+        "Let multiple people create a campaign together.",
+        "Redesign of the web-interface."
+      ]
     }
   ]
 }
