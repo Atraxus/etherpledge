@@ -1,7 +1,11 @@
 {
   "campaigns": [
     {
-      "address": "0x81A3e006947cDCB7324768a6C1ba003d0a9BE754",
+      "projectName": "Etherpledge Campaign",
+      "projectInfo": "Join our week-long campaign for EtherPledge, your trusted decentralized platform. Your pledges are more than donations; they empower you to vote on potential new features for our site. Your support can help shape EtherPledge's future!",
+      "author": "Etherpledge Team",
+      "authorInfo": "Our diverse team at EtherPledge is passionate about using blockchain technology to enhance crowdfunding. United by the goal of transparency and accessibility, we value collaboration, continuous learning, and our supportive community.",
+      "address": "0x1F38630d85d189Eb680fFfc1609C6F7f81C5bc5f",
       "abi": [
         {
           "inputs": [
@@ -369,7 +373,7 @@
         }
       ],
       "goal": "10000000000000000000",
-      "end": "2023-07-21T14:58:21.332Z",
+      "end": "2023-07-21T15:13:19.148Z",
       "descriptions": [
         "Add quorum to decide, when a campaign is successful.",
         "Let multiple people create a campaign together.",

@@ -1,21 +1,21 @@
 <template>
   <div class="container">
-    <h1>Etherpledge Funding</h1>
+    <h1>{{ campaign.name }}</h1>
     <div class="topcontainer">
       <div class="information-container">
         <h2>Project Information</h2>
-        <p>{{ projectInfo }}</p>
+        <p>{{ campaign.info }}</p>
         <p>
           <span class="label">Goal Amount:</span> {{ campaign.goal }}
           <span class="unit">ETH</span>
         </p>
         <p>
           <span class="label">Time Remaining:</span>
-          {{ campaign.timeRemaining }}
+          {{ timeRemaining }}
           <span class="unit">seconds</span>
         </p>
         <p>
-          <span class="label">Raised Money</span> {{ campaign.raisedAmount }}
+          <span class="label">Raised Money</span> {{ raisedAmount }}
           <span class="unit">ETH</span>
         </p>
       </div>
@@ -23,7 +23,7 @@
       <!-- Add this empty spacer element -->
       <div class="funder-information">
         <h2>Funder Information</h2>
-        <p>{{ funderInfo }}</p>
+        <p>{{ campaign.authorInfo }}</p>
         <img
           src="../assets/main.jpg"
           alt="Funder Image"
@@ -171,7 +171,6 @@ li button {
 <script>
 import Web3 from "web3";
 import UserCenter from "@/components/UserCenter.vue";
-import CampaignContract from "../../..//build/contracts/Campaign.json";
 import bigInt from "big-integer";
 import axios from "axios";
 
@@ -187,22 +186,23 @@ export default {
       isWeb3Initialized: false,
       privateKey: "0xd51456b59df4839f76240a0290601d60b39a01de", // Your private key
       balances: {},
+
       contribution: 0,
+      raisedAmount: 0,
+      timeRemaining: 0,
+      status: "Open",
 
       // Etherpledge campaign
       campaign: {
         contract: null,
+        name: null,
+        info: null,
+        author: null,
+        authorInfo: null,
         goal: null,
-        raisedAmount: 0,
         end: null,
-        timeRemaining: 0,
-        status: "Open",
+        descriptions: [],
       },
-
-      projectInfo:
-        "Join our week-long campaign for EtherPledge, your trusted decentralized platform. Your pledges are more than donations; they empower you to vote on potential new features for our site. Your support can help shape EtherPledge's future!",
-      funderInfo:
-        "Our diverse team at EtherPledge is passionate about using blockchain technology to enhance crowdfunding. United by the goal of transparency and accessibility, we value collaboration, continuous learning, and our supportive community.",
 
       allCampaigns: [],
     };
@@ -248,22 +248,32 @@ export default {
         this.campaigns = response.data;
         console.log("Campaigns:", this.campaigns);
 
+        // contract
         this.campaign.contract = new this.web3.eth.Contract(
           this.campaigns[0].abi,
           this.campaigns[0].address
         );
-
+        // name
+        this.campaign.name = this.campaigns[0].projectName;
+        // info
+        this.campaign.info = this.campaigns[0].projectInfo;
+        // author
+        this.campaign.author = this.campaigns[0].author;
+        // authorInfo
+        this.campaign.authorInfo = this.campaigns[0].authorInfo;
+        // goal
         this.campaign.goal = this.web3.utils.fromWei(
           this.campaigns[0].goal,
           "ether"
         );
+        // end
         const date = new Date(this.campaigns[0].end);
         const timestamp = Math.floor(date.getTime() / 1000);
         this.campaign.end = timestamp;
+        // descriptions
+        this.campaign.descriptions = this.campaigns[0].descriptions;
 
         console.log("Campaign Contract:", this.campaign.contract);
-        console.log("Campaign Goal:", this.campaign.goal);
-        console.log("Campaign End:", this.campaign.end);
         console.log("Campaign Events:", this.campaign.contract.events);
       } catch (error) {
         console.error(error);
@@ -310,9 +320,7 @@ export default {
     async updateTimeRemaining() {
       const currentTime = bigInt(Math.floor(Date.now() / 1000));
       const end = bigInt(this.campaign.end);
-      this.campaign.timeRemaining = Number(
-        bigInt.max(bigInt(0), end - currentTime)
-      );
+      this.timeRemaining = Number(bigInt.max(bigInt(0), end - currentTime));
     },
 
     async pledge() {
