@@ -21,6 +21,7 @@ const app = express();
 
 // Allow CORS
 app.use(cors());
+app.use(express.json());
 
 // Define API endpoint
 app.get('/api/campaigns', async (req, res) => {
@@ -36,6 +37,20 @@ app.get('/api/campaigns', async (req, res) => {
 
     // Finally write db.data content to file
     await db.write();
+});
+
+app.post('/api/campaigns', async (req, res) => {
+    // Read data from JSON file
+    await db.read();
+
+    // Add new campaign to data
+    db.data.campaigns.push(req.body);
+
+    // Write updated data to file
+    await db.write();
+
+    // Send a success response
+    res.status(201).json({ message: 'Campaign created successfully' });
 });
 
 app.listen(3000, () => console.log('Server is running on port 3000'));

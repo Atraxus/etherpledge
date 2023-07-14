@@ -1,31 +1,31 @@
 <template>
   <div class="container">
-    <h1>Create a New Project</h1>
+    <h1>Create a New Campaign</h1>
     <div class="project-container">
       <div class="form">
         <div class="input-field">
           <h2>Project Name:</h2>
-          <input type="text" id="projectName" v-model="newProject.name" />
+          <input type="text" id="projectName" v-model="newCampaign.name" />
         </div>
         <div class="input-field">
           <h2>Project Description:</h2>
           <input
             type="text"
             id="projectDescription"
-            v-model="newProject.description"
+            v-model="newCampaign.info"
           />
         </div>
         <div class="input-field">
           <h2>Author:</h2>
-          <input type="text" id="projectAuthor" v-model="newProject.author" />
+          <input type="text" id="projectAuthor" v-model="newCampaign.author" />
         </div>
         <div class="input-field">
           <h2>Goal (ETH):</h2>
-          <input type="number" id="goal" v-model="newProject.goal" />
+          <input type="number" id="goal" v-model="newCampaign.goal" />
         </div>
         <div class="input-field">
           <h2>Duration (hours):</h2>
-          <input type="number" id="duration" v-model="newProject.duration" />
+          <input type="number" id="duration" v-model="newCampaign.duration" />
         </div>
         <button
           class="create-button"
@@ -93,20 +93,26 @@
 <script>
 import Web3 from "web3";
 import CampaignContract from "../../../build/contracts/Campaign.json";
+import axios from "axios";
 
 export default {
   data() {
     return {
       web3: null,
-      campaignContract: null,
       isWeb3Initialized: false,
-      newProject: {
+
+      newCampaign: {
         name: "",
-        description: "",
+        info: "",
         author: "",
+        authorInfo: "",
         goal: 0,
         duration: 0,
+        descriptions: [],
       },
+
+      contractAbi: CampaignContract.abi,
+      contractBytecode: CampaignContract.bytecode,
     };
   },
 
@@ -124,13 +130,6 @@ export default {
         const accounts = await this.web3.eth.getAccounts();
         this.web3.eth.defaultAccount = accounts[0];
 
-        const campaignContractAddress =
-          "0xda81c01e027f12b746817bc373a80d1854e3c763"; // replace with your smart contract address
-        this.campaignContract = new this.web3.eth.Contract(
-          CampaignContract.abi,
-          campaignContractAddress
-        );
-
         this.isWeb3Initialized = true;
       } catch (error) {
         console.error("Failed to initialize Web3:", error);
@@ -138,34 +137,86 @@ export default {
     },
 
     async createProject() {
-      const weiGoal = this.web3.utils.toWei(
-        this.newProject.goal.toString(),
-        "ether"
+      // Convert goal to Wei
+      const goalInWei = this.web3.utils.toWei(this.newCampaign.goal, "ether");
+
+      // Create a new contract instance without deploying
+      const campaignContract = new this.web3.eth.Contract(this.contractAbi);
+
+      // Estimate gas
+      const gas = await campaignContract
+        .deploy({
+          data: this.contractBytecode,
+          arguments: [
+            goalInWei,
+            this.newCampaign.duration,
+            this.newCampaign.descriptions,
+          ],
+        })
+        .estimateGas();
+
+      const gasLimit = BigInt(Math.floor(Number(gas) * 1.2));
+
+      // Deploy the contract
+      console.log(
+        "Bytecode size:",
+        this.contractBytecode.length / 2 / 1024,
+        "KB"
+      );
+      const campaignInstance = await campaignContract
+        .deploy({
+          data: this.contractBytecode,
+          arguments: [
+            goalInWei,
+            this.newCampaign.duration,
+            this.newCampaign.descriptions,
+          ],
+        })
+        .send({ from: this.web3.eth.defaultAccount, gas: gasLimit });
+
+      // Now campaignInstance.options.address holds the address of the newly deployed contract
+      console.log(
+        `New campaign deployed at ${campaignInstance.options.address}`
+      );
+
+      // Write new entry in the database
+      const campaignData = {
+        name: this.newCampaign.name,
+        info: this.newCampaign.info,
+        author: this.newCampaign.author,
+        authorInfo: this.newCampaign.authorInfo,
+        goal: this.newCampaign.goal,
+        duration: this.newCampaign.duration,
+        descriptions: this.newCampaign.descriptions,
+        address: campaignInstance.options.address, // the address of the new contract
+        abi: this.contractAbi, // the abi of the contract
+      };
+      console.log(
+        "Saving the following campaign in the database:",
+        campaignData
       );
 
       try {
-        // Assuming your contract's createProject function takes author and duration as additional arguments
-        await this.campaignContract.methods
-          .createProject(
-            this.newProject.name,
-            this.newProject.description,
-            this.newProject.author,
-            weiGoal,
-            this.newProject.duration
-          )
-          .send({
-            from: this.web3.eth.defaultAccount,
-            gas: 3000000,
-          });
-
-        this.newProject.name = "";
-        this.newProject.description = "";
-        this.newProject.author = "";
-        this.newProject.goal = 0;
-        this.newProject.duration = 0;
+        const response = await axios.post(
+          "http://localhost:3000/api/campaigns",
+          campaignData
+        );
+        console.log(
+          "Successfully saved the campaign in the database:",
+          response.data
+        );
       } catch (error) {
-        console.error(error);
+        console.error("Failed to save the campaign in the database:", error);
       }
+
+      // Reset the form
+      this.newCampaign.name = "";
+      this.newCampaign.info = "";
+      this.newCampaign.author = "";
+      this.newCampaign.authorInfo = "";
+      this.newCampaign.goal = 0;
+      this.newCampaign.duration = 0;
+      this.newCampaign.descriptions = [];
     },
   },
 };

@@ -66,6 +66,7 @@ contract Campaign is Ownable {
         for (uint256 i = 0; i < _descriptions.length; i++) {
             addFeature(_descriptions[i]);
         }
+        emit CampaignCreated(owner(), goal, _duration, featureCount);
     }
 
     function addFeature(string memory description) internal {
