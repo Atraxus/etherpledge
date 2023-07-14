@@ -1,8 +1,7 @@
 {
   "campaigns": [
     {
-      "id": 1,
-      "title": "Campaign 1"
+      "address": "0x900108Af4cbD82091daFFD7169a904d3697Ca935"
     }
   ]
 }

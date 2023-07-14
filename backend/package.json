@@ -4,12 +4,12 @@
     "main": "server.js",
     "type": "module",
     "scripts": {
-        "start": "node server.js",
-        "compile": "truffle compile --config truffle-config.cjs"
+        "start": "node server.js"
     },
     "dependencies": {
-        "@openzeppelin/contracts": "^4.9.1",
-        "big-integer": "^1.6.51",
+        "axios": "^1.4.0",
+        "cors": "^2.8.5",
+        "express": "^4.18.2",
         "lowdb": "^6.0.0"
     }
 }

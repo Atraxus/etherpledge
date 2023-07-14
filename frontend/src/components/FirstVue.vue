@@ -171,8 +171,9 @@ li button {
 <script>
 import Web3 from "web3";
 import UserCenter from "@/components/UserCenter.vue";
-import CampaignContract from "../../../build/contracts/Campaign.json";
+import CampaignContract from "../../..//build/contracts/Campaign.json";
 import bigInt from "big-integer";
+import axios from "axios";
 
 export default {
   components: {
@@ -190,7 +191,7 @@ export default {
 
       // Etherpledge campaign
       campaign: {
-        id: 1,
+        addr: "0x0",
         contract: null,
         goal: null,
         raisedAmount: 0,
@@ -226,7 +227,7 @@ export default {
       try {
         // connect to local ganach
         this.web3 = new Web3(
-          new Web3.providers.WebsocketProvider("ws://localhost:8080")
+          new Web3.providers.WebsocketProvider("ws://localhost:8545")
         );
 
         // get 10 accounts Ganache
@@ -243,19 +244,26 @@ export default {
     },
 
     async loadCampaign() {
-      const campaignContractAddress =
-        "0x91DBAcF75902c703414DDE734E1736bf1A168DB5"; // replace to smart contract
-      this.campaign.contract = new this.web3.eth.Contract(
-        CampaignContract.abi,
-        campaignContractAddress
-      );
+      try {
+        const response = await axios.get("http://localhost:3000/api/campaigns");
+        this.campaigns = response.data;
+        console.log("Campaigns:", this.campaigns);
 
-      console.log("Campaign Contract:", this.campaign.contract);
-      console.log("Campaign Events:", this.campaign.contract.events);
+        this.campaign.address = this.campaigns[0].address;
+        this.campaign.contract = new this.web3.eth.Contract(
+          CampaignContract.abi,
+          this.campaign.address
+        );
 
-      this.campaign.id = 1;
-      this.campaign.goal = 10;
-      this.campaign.end = this.timestampOneWeekFromNow();
+        console.log("Campaign Contract:", this.campaign.contract);
+        console.log("Campaign Events:", this.campaign.contract.events);
+
+        this.campaign.id = 1;
+        this.campaign.goal = 10;
+        this.campaign.end = this.timestampOneWeekFromNow();
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async scanPastEvents(contract) {

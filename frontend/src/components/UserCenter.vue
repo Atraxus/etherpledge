@@ -80,14 +80,9 @@
 
 <script setup>
 // Import required modules and functions
-import { defineExpose } from "vue";
 import { ref, onMounted } from "vue";
 import Web3 from "web3";
-import UserCenter from "@/components/UserCenter.vue";
-import CampaignContract from "../../build/contracts/Campaign.json";
-import VotingTokenContract from "../../build/contracts/VotingToken.json";
-import CreateCrowdfuning from "@/components/CreateCrowdfunding.vue";
-import bigInt from "big-integer";
+
 // import route
 import { useRouter } from "vue-router";
 

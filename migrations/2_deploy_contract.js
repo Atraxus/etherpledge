@@ -1,4 +1,5 @@
 const Campaign = artifacts.require("Campaign");
+const fs = require('fs');
 
 module.exports = function (deployer, network, accounts) {
   // Define your parameters for Campaign constructor
@@ -16,6 +17,22 @@ module.exports = function (deployer, network, accounts) {
       if (Campaign.networks[deployer.network_id]) {
         console.log("Campaign Contract deployed at address:", Campaign.networks[deployer.network_id].address);
         console.log("Campaign Contract ABI:", JSON.stringify(Campaign.abi));
+
+        // Read the existing JSON file
+        let data;
+        try {
+          data = JSON.parse(fs.readFileSync('db.json', 'utf8'));
+        } catch (e) {
+          data = { campaigns: [] };
+        }
+
+        // Add deployed contract address and ABI to data
+        data.campaigns.push({
+          address: Campaign.networks[deployer.network_id].address
+        });
+
+        // Write back to file
+        fs.writeFileSync('db.json', JSON.stringify(data, null, 2));
       }
     });
 };

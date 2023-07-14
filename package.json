@@ -1,9 +1,15 @@
 {
     "name": "etherpledge",
     "version": "0.1.0",
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.9.1"
+    },
     "scripts": {
         "start:frontend": "cd frontend && npm run serve",
         "start:backend": "cd backend && npm run start",
+        "network": "truffle develop",
+        "compile": "truffle compile",
+        "migrate": "truffle migrate --reset --compile-all --network develop",
         "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
     },
     "devDependencies": {

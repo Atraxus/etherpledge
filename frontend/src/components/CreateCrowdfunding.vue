@@ -5,25 +5,35 @@
       <div class="form">
         <div class="input-field">
           <h2>Project Name:</h2>
-          <input type="text" id="projectName" v-model="newProject.name">
+          <input type="text" id="projectName" v-model="newProject.name" />
         </div>
         <div class="input-field">
           <h2>Project Description:</h2>
-          <input type="text" id="projectDescription" v-model="newProject.description">
+          <input
+            type="text"
+            id="projectDescription"
+            v-model="newProject.description"
+          />
         </div>
         <div class="input-field">
           <h2>Author:</h2>
-          <input type="text" id="projectAuthor" v-model="newProject.author">
+          <input type="text" id="projectAuthor" v-model="newProject.author" />
         </div>
         <div class="input-field">
           <h2>Goal (ETH):</h2>
-          <input type="number" id="goal" v-model="newProject.goal">
+          <input type="number" id="goal" v-model="newProject.goal" />
         </div>
         <div class="input-field">
           <h2>Duration (hours):</h2>
-          <input type="number" id="duration" v-model="newProject.duration">
+          <input type="number" id="duration" v-model="newProject.duration" />
         </div>
-        <button class="create-button" @click="createProject" :disabled="!isWeb3Initialized">Create Project</button>
+        <button
+          class="create-button"
+          @click="createProject"
+          :disabled="!isWeb3Initialized"
+        >
+          Create Project
+        </button>
       </div>
     </div>
   </div>
@@ -44,7 +54,7 @@
   background-color: #ffffff;
   padding: 20px;
   border-radius: 5px;
-  box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.2);
 }
 
 .form {
@@ -82,7 +92,7 @@
 
 <script>
 import Web3 from "web3";
-import CampaignContract from "../../build/contracts/Campaign.json";
+import CampaignContract from "../../../build/contracts/Campaign.json";
 
 export default {
   data() {
@@ -91,9 +101,9 @@ export default {
       campaignContract: null,
       isWeb3Initialized: false,
       newProject: {
-        name: '',
-        description: '',
-        author: '',
+        name: "",
+        description: "",
+        author: "",
         goal: 0,
         duration: 0,
       },
@@ -108,13 +118,14 @@ export default {
     async initializeWeb3() {
       try {
         this.web3 = new Web3(
-          new Web3.providers.HttpProvider("http://localhost:8545")//change to your locla ganach
+          new Web3.providers.HttpProvider("http://localhost:8545") //change to your locla ganach
         );
 
         const accounts = await this.web3.eth.getAccounts();
         this.web3.eth.defaultAccount = accounts[0];
-        
-        const campaignContractAddress = "0xda81c01e027f12b746817bc373a80d1854e3c763"; // replace with your smart contract address
+
+        const campaignContractAddress =
+          "0xda81c01e027f12b746817bc373a80d1854e3c763"; // replace with your smart contract address
         this.campaignContract = new this.web3.eth.Contract(
           CampaignContract.abi,
           campaignContractAddress
@@ -134,20 +145,22 @@ export default {
 
       try {
         // Assuming your contract's createProject function takes author and duration as additional arguments
-        await this.campaignContract.methods.createProject(
-          this.newProject.name,
-          this.newProject.description,
-          this.newProject.author,
-          weiGoal,
-          this.newProject.duration
-        ).send({
-          from: this.web3.eth.defaultAccount,
-          gas: 3000000,
-        });
+        await this.campaignContract.methods
+          .createProject(
+            this.newProject.name,
+            this.newProject.description,
+            this.newProject.author,
+            weiGoal,
+            this.newProject.duration
+          )
+          .send({
+            from: this.web3.eth.defaultAccount,
+            gas: 3000000,
+          });
 
-        this.newProject.name = '';
-        this.newProject.description = '';
-        this.newProject.author = '';
+        this.newProject.name = "";
+        this.newProject.description = "";
+        this.newProject.author = "";
         this.newProject.goal = 0;
         this.newProject.duration = 0;
       } catch (error) {
