@@ -1,74 +1,3 @@
-<script setup>
-// Import required modules and functions
-import { defineExpose } from "vue";
-import { ref, onMounted } from "vue";
-import Web3 from "web3";
-import UserCenter from "@/components/UserCenter.vue";
-import CampaignContract from "../../build/contracts/Campaign.json";
-import VotingTokenContract from "../../build/contracts/VotingToken.json";
-import CreateCrowdfuning from "@/components/CreateCrowdfunding.vue";
-import bigInt from "big-integer";
-// import route
-import { useRouter } from "vue-router";
-
-// Get routing instance
-const router = useRouter();
-
-// Create a web3 instance, if in a browser that supports Ethereum &quot;Web3.providers.given Provider&quot; will be set.
-const web3 = new Web3(
-  Web3.givenProvider ||
-    "https://sepolia.infura.io/v3/0bae90d1476b4b97b8222e545de219e9"
-);
-
-// create Account
-// const account = web3.eth.accounts.create('123');
-
-// OR Replace with the private key of your Ethereum account
-const privateKey =
-  "0xfd3b8c962d6c2093bd8d26488174ec0b1ebb11f5cfbceb273dd83b6a95fa50fb";
-
-// Convert private key to account object
-const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-// Define the balance variable
-const mount = ref(1);
-
-// Get the balance after the component is mounted
-onMounted(async () => {
-  try {
-    // Get address balance
-    const balance = await web3.eth.getBalance(account.address);
-
-    // Assign the balance to mount
-    mount.value = web3.utils.fromWei(balance, "ether");
-  } catch (error) {
-    console.error("获取地址余额时出错：", error);
-  }
-});
-
-// Transfer operation
-const send = async () => {
-  console.log("test send");
-  // 1. Construct transfer parameters
-  // Number of account transactions
-  const nonce = await web3.eth.getTransactionCount(account.address.value);
-  console.log(nonce);
-  // Get the gas cost of the estimated transfer
-  const gasPrise = web3.eth.getGasPrice();
-  // Transfer amount, in wei
-  const value = web3.utils.toWei("0.01");
-  console.log(value);
-  // P23 19:00https://www.bilibili.com/video/BV14A411178x?p=23&spm_id_from=pageDriver&vd_source=7550b7ac162b7a1c3b89987953b944bb
-};
-const gotoStartCrowdfunding = () => {
-  router.push("/createcrowdfunding");
-};
-
-const discoverCount = ref(8);
-
-const joinedCount = ref(2);
-const favoriteCount = ref(5);
-</script>
-
 <template>
   <div class="container">
     <div class="logo">
@@ -149,13 +78,82 @@ const favoriteCount = ref(5);
   </div>
 </template>
 
+<script setup>
+// Import required modules and functions
+import { defineExpose } from "vue";
+import { ref, onMounted } from "vue";
+import Web3 from "web3";
+import UserCenter from "@/components/UserCenter.vue";
+import CampaignContract from "../../build/contracts/Campaign.json";
+import VotingTokenContract from "../../build/contracts/VotingToken.json";
+import CreateCrowdfuning from "@/components/CreateCrowdfunding.vue";
+import bigInt from "big-integer";
+// import route
+import { useRouter } from "vue-router";
 
+// Get routing instance
+const router = useRouter();
+
+// Create a web3 instance, if in a browser that supports Ethereum &quot;Web3.providers.given Provider&quot; will be set.
+const web3 = new Web3(
+  Web3.givenProvider ||
+    "https://sepolia.infura.io/v3/0bae90d1476b4b97b8222e545de219e9"
+);
+
+// create Account
+// const account = web3.eth.accounts.create('123');
+
+// OR Replace with the private key of your Ethereum account
+const privateKey =
+  "0xfd3b8c962d6c2093bd8d26488174ec0b1ebb11f5cfbceb273dd83b6a95fa50fb";
+
+// Convert private key to account object
+const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+// Define the balance variable
+const mount = ref(1);
+
+// Get the balance after the component is mounted
+onMounted(async () => {
+  try {
+    // Get address balance
+    const balance = await web3.eth.getBalance(account.address);
+
+    // Assign the balance to mount
+    mount.value = web3.utils.fromWei(balance, "ether");
+  } catch (error) {
+    console.error("Error getting address balance:", error);
+  }
+});
+
+// Transfer operation
+const send = async () => {
+  console.log("test send");
+  // 1. Construct transfer parameters
+  // Number of account transactions
+  const nonce = await web3.eth.getTransactionCount(account.address.value);
+  console.log(nonce);
+  // Get the gas cost of the estimated transfer
+  const gasPrise = web3.eth.getGasPrice();
+  // Transfer amount, in wei
+  const value = web3.utils.toWei("0.01");
+  console.log(value);
+  // P23 19:00https://www.bilibili.com/video/BV14A411178x?p=23&spm_id_from=pageDriver&vd_source=7550b7ac162b7a1c3b89987953b944bb
+};
+const gotoStartCrowdfunding = () => {
+  router.push("/createcrowdfunding");
+};
+
+const discoverCount = ref(8);
+
+const joinedCount = ref(2);
+const favoriteCount = ref(5);
+</script>
 
 <style lang="less">
 h1,
 h2,
 h3 {
-  text-align: center; /* 添加居中对齐样式 */
+  text-align: center; /* Add center alignment style */
 }
 .container {
   justify-content: center;
