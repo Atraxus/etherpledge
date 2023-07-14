@@ -191,7 +191,6 @@ export default {
 
       // Etherpledge campaign
       campaign: {
-        addr: "0x0",
         contract: null,
         goal: null,
         raisedAmount: 0,
@@ -249,18 +248,23 @@ export default {
         this.campaigns = response.data;
         console.log("Campaigns:", this.campaigns);
 
-        this.campaign.address = this.campaigns[0].address;
         this.campaign.contract = new this.web3.eth.Contract(
           this.campaigns[0].abi,
-          this.campaign.address
+          this.campaigns[0].address
         );
 
-        console.log("Campaign Contract:", this.campaign.contract);
-        console.log("Campaign Events:", this.campaign.contract.events);
+        this.campaign.goal = this.web3.utils.fromWei(
+          this.campaigns[0].goal,
+          "ether"
+        );
+        const date = new Date(this.campaigns[0].end);
+        const timestamp = Math.floor(date.getTime() / 1000);
+        this.campaign.end = timestamp;
 
-        this.campaign.id = 1;
-        this.campaign.goal = 10;
-        this.campaign.end = this.timestampOneWeekFromNow();
+        console.log("Campaign Contract:", this.campaign.contract);
+        console.log("Campaign Goal:", this.campaign.goal);
+        console.log("Campaign End:", this.campaign.end);
+        console.log("Campaign Events:", this.campaign.contract.events);
       } catch (error) {
         console.error(error);
       }

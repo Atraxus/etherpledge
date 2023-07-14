@@ -26,6 +26,7 @@ module.exports = function (deployer, network, accounts) {
         deadline.setTime(deadline.getTime() + _duration * 1000);
         data.campaigns.push({
           address: Campaign.networks[deployer.network_id].address,
+          abi: Campaign.abi,
           goal: _goal,
           end: deadline,
           descriptions: _descriptions,
