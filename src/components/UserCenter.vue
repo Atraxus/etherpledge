@@ -1,5 +1,5 @@
 <script setup>
-// 导入需要的模块和函数
+// Import required modules and functions
 import { defineExpose } from "vue";
 import { ref, onMounted } from "vue";
 import Web3 from "web3";
@@ -8,52 +8,53 @@ import CampaignContract from "../../build/contracts/Campaign.json";
 import VotingTokenContract from "../../build/contracts/VotingToken.json";
 import CreateCrowdfuning from "@/components/CreateCrowdfunding.vue";
 import bigInt from "big-integer";
-// 导入路由
+// import route
 import { useRouter } from "vue-router";
 
-// 获取路由实例
+// Get routing instance
 const router = useRouter();
 
-// 创建web3实例，如果在支持以太坊的浏览器 "Web3.providers.givenProvider" 会被设置。
+// Create a web3 instance, if in a browser that supports Ethereum &quot;Web3.providers.given Provider&quot; will be set.
 const web3 = new Web3(
   Web3.givenProvider ||
     "https://sepolia.infura.io/v3/0bae90d1476b4b97b8222e545de219e9"
 );
 
-// 创建账户
+// create Account
 // const account = web3.eth.accounts.create('123');
-// 替换为你的以太坊账号的私钥
+
+// OR Replace with the private key of your Ethereum account
 const privateKey =
   "0xfd3b8c962d6c2093bd8d26488174ec0b1ebb11f5cfbceb273dd83b6a95fa50fb";
 
-// 将私钥转换为账号对象
+// Convert private key to account object
 const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-// 定义余额变量
+// Define the balance variable
 const mount = ref(1);
 
-// 在组件挂载后获取余额
+// Get the balance after the component is mounted
 onMounted(async () => {
   try {
-    // 获取地址余额
+    // Get address balance
     const balance = await web3.eth.getBalance(account.address);
 
-    // 将余额赋值给mount
+    // Assign the balance to mount
     mount.value = web3.utils.fromWei(balance, "ether");
   } catch (error) {
     console.error("获取地址余额时出错：", error);
   }
 });
 
-// 转账操作
+// Transfer operation
 const send = async () => {
   console.log("test send");
-  // 1.构建转账的参数
-  // 账户交易的次数
+  // 1. Construct transfer parameters
+  // Number of account transactions
   const nonce = await web3.eth.getTransactionCount(account.address.value);
   console.log(nonce);
-  // 获取预计转账的gas费用
+  // Get the gas cost of the estimated transfer
   const gasPrise = web3.eth.getGasPrice();
-  // 转账金额，以wei为单位
+  // Transfer amount, in wei
   const value = web3.utils.toWei("0.01");
   console.log(value);
   // P23 19:00https://www.bilibili.com/video/BV14A411178x?p=23&spm_id_from=pageDriver&vd_source=7550b7ac162b7a1c3b89987953b944bb
@@ -210,7 +211,7 @@ h3 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 19px; /* 设置统一的高度 */
+  height: 19px; /* set uniform height */
 }
 
 .copy-button {
@@ -223,31 +224,31 @@ h3 {
 .CrowdfundingProjectNumber {
   display: flex;
   justify-content: space-between;
-  margin-top: 30px; /* 调整位置 */
+  margin-top: 30px; /* Adjust position */
 }
 
 .discoverCount {
   position: absolute;
-  left: 16.67%; /* 六分之一位置 */
-  font-size: 24px; /* 调整数字尺寸 */
+  left: 16.67%; /* One-sixth position */
+  font-size: 24px; /* adjust the number size */
 }
 .joinedCount {
   position: absolute;
-  left: 50%; /* 中心位置 */
+  left: 50%; /* Central location */
   transform: translateX(-50%);
-  font-size: 24px; /* 调整数字尺寸 */
+  font-size: 24px; /* adjust the number size */
 }
 
 .favoriteCount {
   position: absolute;
-  right: 16.67%; /* 六分之五位置 */
-  font-size: 24px; /* 调整数字尺寸 */
+  right: 16.67%; /* five out of six positions */
+  font-size: 24px; /* adjust the number size */
 }
 
 .CrowdfundingProject {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px; /* 调整位置 */
+  margin-top: 20px; /* Adjust position */
 }
 
 .textbox-button {
@@ -284,7 +285,7 @@ h3 {
 
 .count {
   position: relative;
-  top: -20px; /* 调整位置 */
+  top: -20px; /* Adjust position */
   text-align: center;
   font-size: 16px;
   color: black;
