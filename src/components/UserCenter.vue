@@ -121,7 +121,7 @@ onMounted(async () => {
     // Assign the balance to mount
     mount.value = web3.utils.fromWei(balance, "ether");
   } catch (error) {
-    console.error("Error getting address balance:", error);
+    console.error("Error getting address balance", error);
   }
 });
 
