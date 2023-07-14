@@ -2,12 +2,14 @@
     "name": "etherpledge-backend",
     "version": "0.1.0",
     "main": "server.js",
+    "type": "module",
     "scripts": {
-        "start": "node server.js"
+        "start": "node server.js",
+        "compile": "truffle compile --config truffle-config.cjs"
     },
     "dependencies": {
         "@openzeppelin/contracts": "^4.9.1",
         "big-integer": "^1.6.51",
-        "lowdb": "^1.0.0"
+        "lowdb": "^6.0.0"
     }
 }

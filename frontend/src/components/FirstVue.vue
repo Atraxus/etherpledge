@@ -171,7 +171,7 @@ li button {
 <script>
 import Web3 from "web3";
 import UserCenter from "@/components/UserCenter.vue";
-import CampaignContract from "../../build/contracts/Campaign.json";
+import CampaignContract from "../../../build/contracts/Campaign.json";
 import bigInt from "big-integer";
 
 export default {
