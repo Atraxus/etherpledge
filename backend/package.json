@@ -1,0 +1,13 @@
+{
+    "name": "etherpledge-backend",
+    "version": "0.1.0",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "@openzeppelin/contracts": "^4.9.1",
+        "big-integer": "^1.6.51",
+        "lowdb": "^1.0.0"
+    }
+}

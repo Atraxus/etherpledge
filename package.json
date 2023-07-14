@@ -1,38 +1,12 @@
 {
-  "dependencies": {
-    "@openzeppelin/contracts": "^4.9.1",
-    "@vue/cli-service": "^5.0.0",
-    "big-integer": "^1.6.51",
-    "vant": "^4.6.2",
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.4",
-    "web3": "^4.0.1"
-  },
-  "name": "etherpledge",
-  "description": "EtherPledge is a university project, where we intend to create a crowdfunding platform based on blockchain technologies.",
-  "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Atraxus/etherpledge.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Atraxus/etherpledge/issues"
-  },
-  "homepage": "https://github.com/Atraxus/etherpledge#readme",
-  "devDependencies": {
-    "less": "^4.1.3",
-    "less-loader": "^11.1.3"
-  }
+    "name": "etherpledge",
+    "version": "0.1.0",
+    "scripts": {
+        "start:frontend": "cd frontend && npm run serve",
+        "start:backend": "cd backend && npm run start",
+        "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
+    },
+    "devDependencies": {
+        "concurrently": "^6.2.0"
+    }
 }
