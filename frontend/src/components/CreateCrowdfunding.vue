@@ -180,13 +180,15 @@ export default {
       );
 
       // Write new entry in the database
+      let end = new Date();
+      end.setHours(end.getHours() + this.newCampaign.duration);
       const campaignData = {
         name: this.newCampaign.name,
         info: this.newCampaign.info,
         author: this.newCampaign.author,
         authorInfo: this.newCampaign.authorInfo,
         goal: this.newCampaign.goal,
-        duration: this.newCampaign.duration,
+        end: end,
         descriptions: this.newCampaign.descriptions,
         address: campaignInstance.options.address, // the address of the new contract
         abi: this.contractAbi, // the abi of the contract

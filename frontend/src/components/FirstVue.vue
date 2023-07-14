@@ -56,9 +56,10 @@
     <div class="bottomcontainer">
       <h3>Other Projects You May Be Interested In:</h3>
       <ul>
-        <li v-for="project in allCampaigns" :key="project.id">
-          {{ project.name }} - {{ project.description }}
-          <button @click="view(project.id)">View</button>
+        <li v-for="(campaign, index) in campaigns" :key="index">
+          <a href="#" @click.prevent="loadCampaign(index)">{{
+            campaign.name
+          }}</a>
         </li>
       </ul>
 
@@ -204,13 +205,13 @@ export default {
         descriptions: [],
       },
 
-      allCampaigns: [],
+      campaigns: [],
     };
   },
 
   async mounted() {
     await this.initializeWeb3();
-    await this.loadCampaign();
+    await this.loadCampaign(0);
     if (this.campaign.contract !== null) {
       this.loadBalances();
       this.updateRaisedAmount();
@@ -242,36 +243,44 @@ export default {
       }
     },
 
-    async loadCampaign() {
+    async loadCampaign(idx) {
       try {
+        console.log("Loading campaign:", idx);
         const response = await axios.get("http://localhost:3000/api/campaigns");
         this.campaigns = response.data;
         console.log("Campaigns:", this.campaigns);
 
+        if (idx >= this.campaigns.length || idx < 0) {
+          throw new Error("Invalid campaign index");
+        }
+
+        const campaignData = this.campaigns[idx];
+        console.log("Campaign Data:", campaignData);
+
         // contract
         this.campaign.contract = new this.web3.eth.Contract(
-          this.campaigns[0].abi,
-          this.campaigns[0].address
+          campaignData.abi,
+          campaignData.address
         );
         // name
-        this.campaign.name = this.campaigns[0].projectName;
+        this.campaign.name = campaignData.name;
         // info
-        this.campaign.info = this.campaigns[0].projectInfo;
+        this.campaign.info = campaignData.info;
         // author
-        this.campaign.author = this.campaigns[0].author;
+        this.campaign.author = campaignData.author;
         // authorInfo
-        this.campaign.authorInfo = this.campaigns[0].authorInfo;
+        this.campaign.authorInfo = campaignData.authorInfo;
         // goal
         this.campaign.goal = this.web3.utils.fromWei(
-          this.campaigns[0].goal,
+          campaignData.goal,
           "ether"
         );
         // end
-        const date = new Date(this.campaigns[0].end);
+        const date = new Date(campaignData.end);
         const timestamp = Math.floor(date.getTime() / 1000);
         this.campaign.end = timestamp;
         // descriptions
-        this.campaign.descriptions = this.campaigns[0].descriptions;
+        this.campaign.descriptions = campaignData.descriptions;
 
         console.log("Campaign Contract:", this.campaign.contract);
         console.log("Campaign Events:", this.campaign.contract.events);

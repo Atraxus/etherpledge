@@ -25,8 +25,8 @@ module.exports = function (deployer, network, accounts) {
         let deadline = new Date();
         deadline.setTime(deadline.getTime() + _duration * 1000);
         data.campaigns.push({
-          projectName: "Etherpledge Campaign",
-          projectInfo: "Join our week-long campaign for EtherPledge, your trusted decentralized platform. Your pledges are more than donations; they empower you to vote on potential new features for our site. Your support can help shape EtherPledge's future!",
+          name: "Etherpledge Campaign",
+          info: "Join our week-long campaign for EtherPledge, your trusted decentralized platform. Your pledges are more than donations; they empower you to vote on potential new features for our site. Your support can help shape EtherPledge's future!",
           author: "Etherpledge Team",
           authorInfo: "Our diverse team at EtherPledge is passionate about using blockchain technology to enhance crowdfunding. United by the goal of transparency and accessibility, we value collaboration, continuous learning, and our supportive community.",
           address: Campaign.networks[deployer.network_id].address,
