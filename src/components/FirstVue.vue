@@ -1,20 +1,21 @@
 <template>
   <div class="container">
-    <h1>Top Project Today</h1>
+    <h1>Etherpledge Funding</h1>
     <div class="topcontainer">
       <div class="information-container">
         <h2>Project Information</h2>
         <p>{{ projectInfo }}</p>
         <p>
-          <span class="label">Goal Amount:</span> {{ goal }}
+          <span class="label">Goal Amount:</span> {{ campaign.goal }}
           <span class="unit">ETH</span>
         </p>
         <p>
-          <span class="label">Time Remaining:</span> {{ timeRemaining }}
+          <span class="label">Time Remaining:</span>
+          {{ campaign.timeRemaining }}
           <span class="unit">seconds</span>
         </p>
         <p>
-          <span class="label">Raised Money</span> {{ raisedAmount }}
+          <span class="label">Raised Money</span> {{ campaign.raisedAmount }}
           <span class="unit">ETH</span>
         </p>
       </div>
@@ -55,7 +56,7 @@
     <div class="bottomcontainer">
       <h3>Other Projects You May Be Interested In:</h3>
       <ul>
-        <li v-for="project in projects" :key="project.id">
+        <li v-for="project in allCampaigns" :key="project.id">
           {{ project.name }} - {{ project.description }}
           <button @click="view(project.id)">View</button>
         </li>
@@ -147,8 +148,8 @@ h3 {
   top: 100px;
   right: 10px;
 
-  padding: 10px 30px; /* 调整按钮的上下和左右内边距 */
-  font-size: 18px; /* 调整按钮的字体大小 */
+  padding: 10px 30px;
+  font-size: 18px;
 }
 
 ul {
@@ -180,38 +181,41 @@ export default {
 
   data() {
     return {
+      // Metadata
       web3: null,
-      campaignContract: null,
-      goal: null,
-      raisedAmount: 0,
-      end: null,
-      timeRemaining: 0,
-      contribution: 0,
-      balances: {},
       isWeb3Initialized: false,
+      privateKey: "0xd51456b59df4839f76240a0290601d60b39a01de", // Your private key
+      balances: {},
+      contribution: 0,
+
+      // Etherpledge campaign
+      campaign: {
+        id: 1,
+        contract: null,
+        goal: null,
+        raisedAmount: 0,
+        end: null,
+        timeRemaining: 0,
+        status: "Open",
+      },
+
       projectInfo:
-        "*****************************************************\n*****************************************************\n*****************************************************\n*****************************************************",
+        "Join our week-long campaign for EtherPledge, your trusted decentralized platform. Your pledges are more than donations; they empower you to vote on potential new features for our site. Your support can help shape EtherPledge's future!",
       funderInfo:
-        "*****************************************************\n*****************************************************\n*****************************************************",
-      projects: [
-        {
-          id: 1,
-          name: "Buy a Cat",
-          description: "A project to raise funds for buying a lovely cat",
-        },
-      ],
-      privateKey: "0xd51456b59df4839f76240a0290601d60b39a01de", // 您的私钥
-      status: "Open",
+        "Our diverse team at EtherPledge is passionate about using blockchain technology to enhance crowdfunding. United by the goal of transparency and accessibility, we value collaboration, continuous learning, and our supportive community.",
+
+      allCampaigns: [],
     };
   },
 
   async mounted() {
     await this.initializeWeb3();
-    if (this.campaignContract !== null) {
+    await this.loadCampaign();
+    if (this.campaign.contract !== null) {
       this.loadBalances();
       this.updateRaisedAmount();
-      this.scanPastEvents(this.campaignContract);
-      this.subscribeToNewEvents(this.campaignContract);
+      this.scanPastEvents(this.campaign.contract);
+      this.subscribeToNewEvents(this.campaign.contract);
     }
     setInterval(this.updateTimeRemaining, 1000);
     this.status = "Open";
@@ -232,20 +236,26 @@ export default {
         this.web3.eth.defaultAccount = accounts[0];
         console.log("Accounts:", accounts); // print account list
 
-        const campaignContractAddress =
-          "0x17BeB31346451C741BcAA09F00699Fd64A8CE476"; // replace to smart contract
-        this.campaignContract = new this.web3.eth.Contract(
-          CampaignContract.abi,
-          campaignContractAddress
-        );
-
-        console.log("Campaign Contract:", this.campaignContract);
-        console.log("Campaign Events:", this.campaignContract.events);
-
         this.isWeb3Initialized = true;
       } catch (error) {
         console.error("Failed to initialize Web3:", error);
       }
+    },
+
+    async loadCampaign() {
+      const campaignContractAddress =
+        "0x91DBAcF75902c703414DDE734E1736bf1A168DB5"; // replace to smart contract
+      this.campaign.contract = new this.web3.eth.Contract(
+        CampaignContract.abi,
+        campaignContractAddress
+      );
+
+      console.log("Campaign Contract:", this.campaign.contract);
+      console.log("Campaign Events:", this.campaign.contract.events);
+
+      this.campaign.id = 1;
+      this.campaign.goal = 10;
+      this.campaign.end = this.timestampOneWeekFromNow();
     },
 
     async scanPastEvents(contract) {
@@ -287,8 +297,10 @@ export default {
 
     async updateTimeRemaining() {
       const currentTime = bigInt(Math.floor(Date.now() / 1000));
-      const end = bigInt(this.end);
-      this.timeRemaining = Number(bigInt.max(bigInt(0), end - currentTime));
+      const end = bigInt(this.campaign.end);
+      this.campaign.timeRemaining = Number(
+        bigInt.max(bigInt(0), end - currentTime)
+      );
     },
 
     async pledge() {
@@ -298,7 +310,7 @@ export default {
       );
 
       try {
-        await this.campaignContract.methods.pledge().send({
+        await this.campaign.contract.methods.pledge().send({
           from: this.web3.eth.defaultAccount,
           value: weiAmount,
           gas: 3000000,
@@ -331,9 +343,9 @@ export default {
     async updateRaisedAmount() {
       try {
         const balance = await this.web3.eth.getBalance(
-          this.campaignContract.options.address
+          this.campaign.contract.options.address
         );
-        this.raisedAmount = this.web3.utils.fromWei(balance, "ether");
+        this.campaign.raisedAmount = this.web3.utils.fromWei(balance, "ether");
       } catch (error) {
         console.error("Failed to update raised amount:", error);
       }
@@ -341,6 +353,12 @@ export default {
 
     login() {
       this.$router.push({ name: "UserCenter" });
+    },
+
+    timestampOneWeekFromNow() {
+      const now = new Date();
+      now.setDate(now.getDate() + 7);
+      return Math.floor(now.getTime() / 1000);
     },
   },
 };

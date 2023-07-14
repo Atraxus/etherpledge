@@ -3,11 +3,11 @@ const Campaign = artifacts.require("Campaign");
 module.exports = function (deployer, network, accounts) {
   // Define your parameters for Campaign constructor
   const _goal = web3.utils.toWei('10', 'ether');
-  const _duration = 60 * 60 * 24; // 1 day in seconds
+  const _duration = 7 * 60 * 60 * 24; // 1 week in seconds
   const _descriptions = [
-    "This is the first description",
-    "This is the second description",
-    "This is the third description"
+    "Add quorum to decide, when a campaign is successful.",
+    "Let multiple people create a campaign together.",
+    "Redesign of the web-interface.",
   ];
 
   // Pass the parameters to the deploy function of Campaign
