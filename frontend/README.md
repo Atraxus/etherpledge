@@ -8,9 +8,10 @@ We currently only support a build with VSCode and the Solidity extension. The ex
 1. Install [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) (Downgrade to pecific version below 9.0.0; e.g. ``npm install -g npm@8.19.4``)
 2. Install [Truffle](http://truffleframework.com/) globally: `npm install -g truffle`
 3. Install [Vue.js](https://vuejs.org/) globally: `npm install -g @vue/cli`
-4. Install [Ganache](http://truffleframework.com/ganache/) globally: ``npm install -g ganache-cli``
-5. Clone this repository
-6. Run `npm install` in the project directory
+4. Install [vant](https://vant-ui.github.io/vant/#/en-US) globally:`npm install vant`
+5. Install [Ganache](http://truffleframework.com/ganache/) globally: ``npm install -g ganache-cli``
+6. Clone this repository
+7. Run `npm install` in the project directory
 
 ### Backend
 Run the following commands in the project directory:
@@ -20,5 +21,6 @@ Run the following commands in the project directory:
 
 ### Frontend
 - Run ``npm run serve`` and open the displayed URL in your browser
-
-
+- npm install --save-dev less-loader less
+- npm install vue-router@4
+- remember change the contract address,private key in the FirstVue.vue base on the deployment

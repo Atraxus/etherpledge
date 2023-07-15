@@ -1,18 +1,13 @@
 <template>
   <div id="app">
-    <FirstVue />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import FirstVue from './components/FirstVue.vue'
-
 export default {
-  name: 'App',
-  components: {
-    FirstVue
-  }
-}
+  name: "App",
+};
 </script>
 
 <style>
