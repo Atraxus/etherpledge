@@ -43,22 +43,30 @@ contract Campaign is Ownable {
     // Event emitted when a user votes for a feature. This should be received by the
     // frontend to link it with the campaign.
     event Voted(address indexed voter, uint256 tokens, uint256 featureId);
+    // Event emitted when the contract is constructed. This should be received by the
+    // frontend to link it with the campaign.
+    event CampaignCreated(
+        address indexed owner,
+        uint256 goal,
+        uint256 duration,
+        uint256 featureCount
+    );
 
     // ------------------ FUNCTIONS ------------------
 
     // Constructor takes in the token for voting, the funding goal, the duration of the campaign, and the features to vote on.
     constructor(
-        VotingToken _token,
         uint256 _goal,
         uint256 _duration,
         string[] memory _descriptions
     ) {
-        token = _token;
+        token = new VotingToken();
         goal = _goal;
         end = block.timestamp + _duration;
         for (uint256 i = 0; i < _descriptions.length; i++) {
             addFeature(_descriptions[i]);
         }
+        emit CampaignCreated(owner(), goal, _duration, featureCount);
     }
 
     function addFeature(string memory description) internal {

@@ -1,9 +1,11 @@
 module.exports = {
   networks: {
-    development: {
-      network_id: "*",
+    develop: {
+      host: "127.0.0.1",
       port: 8545,
-      host: "127.0.0.1"
+      network_id: "*",
+      accounts: 10,
+      defaultEtherBalance: 1000,
     }
   },
   mocha: {},
