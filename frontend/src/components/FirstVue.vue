@@ -48,7 +48,7 @@
         <h3>Contributor List</h3>
         <ul>
           <li v-for="(balance, address) in balances" :key="address">
-            {{ address }}: {{ balance }} ETH
+            {{ address }}: {{ 1100-balance }} ETH
           </li>
         </ul>
       </div>
@@ -57,14 +57,11 @@
       <h3>Other Projects You May Be Interested In:</h3>
       <ul>
         <li v-for="(campaign, index) in campaigns" :key="index">
-          <a href="#" @click.prevent="loadCampaign(index)">{{
-            campaign.name
-          }}</a>
+          <button class="project-button" @click.prevent="reloadPage(index)">  {{ campaign.name }}</button>
         </li>
       </ul>
-
-      <button class="login-button" @click="login">Login</button>
     </div>
+    <button class="login-button" @click="login">Login</button>
   </div>
 </template>
 
@@ -148,11 +145,15 @@ h3 {
   position: absolute;
   top: 100px;
   right: 10px;
-
+  color: black;
   padding: 10px 30px;
   font-size: 18px;
 }
-
+.project-button
+{
+  color: blue; 
+  font-size: 18px;
+}
 ul {
   list-style-type: none;
   padding: 0;
@@ -172,6 +173,7 @@ li button {
 <script>
 import Web3 from "web3";
 import UserCenter from "@/components/UserCenter.vue";
+import FirstVue from '../components/FirstVue.vue';
 import bigInt from "big-integer";
 import axios from "axios";
 
@@ -179,7 +181,12 @@ export default {
   components: {
     UserCenter,
   },
-
+  beforeRouteUpdate(to, from, next) {
+    if (to.query.campaignIndex !== undefined && to.query.campaignIndex !== from.query.campaignIndex) {
+      this.loadCampaign(parseInt(to.query.campaignIndex));
+    }
+    next();
+  },
   data() {
     return {
       // Metadata
@@ -283,6 +290,7 @@ export default {
 
         console.log("Campaign Contract:", this.campaign.contract);
         console.log("Campaign Events:", this.campaign.contract.events);
+        
       } catch (error) {
         console.error(error);
       }
@@ -394,6 +402,11 @@ export default {
       const now = new Date();
       now.setDate(now.getDate() + 7);
       return Math.floor(now.getTime() / 1000);
+    },
+    reloadPage(index) {
+      const campaignIndex = index.toString();
+      this.$router.push({ name: "FirstVue", query: { campaignIndex } });
+      this.loadCampaign(parseInt(campaignIndex));
     },
   },
 };
