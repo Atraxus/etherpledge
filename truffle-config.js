@@ -1,11 +1,16 @@
 module.exports = {
   networks: {
-    develop: {
-      host: "127.0.0.1",
-      port: 8545,
+    development: {
       network_id: "*",
-      accounts: 10,
-      defaultEtherBalance: 1000,
+      port: 8545,
+      host: "127.0.0.1",
+      chainId: 1337
+    },
+    loc_development_development: {
+      network_id: "*",
+      port: 8545,
+      host: "127.0.0.1",
+      chainId: 1337
     }
   },
   mocha: {},
